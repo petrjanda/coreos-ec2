@@ -4,6 +4,7 @@ import env
 
 from cluster import Cluster
 from cluster_launcher import ClusterLauncher
+from cloud_config import CloudConfig
 
 env.check()
 
@@ -17,13 +18,18 @@ args = parser.parse_args()
 
 region = os.getenv("AWS_DEFAULT_REGION")
 
+print("--> Updating cloud-config")
+cloud_config = CloudConfig(
+  open(args.cloud_config_path).read()
+).with_new_token(args.instances_count)
+
 launcher = ClusterLauncher(
-  aws, region, args.default_key_pair_name, [args.default_security_group]
+  region, args.default_key_pair_name, [args.default_security_group]
 )
 
 launcher.launch(
   args.cluster_name, 
-  open(args.cloud_config_path).read(), 
+  cloud_config, 
   count = int(args.instances_count)
 )
 
