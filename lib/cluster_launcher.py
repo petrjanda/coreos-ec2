@@ -6,18 +6,30 @@ class ClusterLauncher:
   """ Cluster formation """
 
   coreos_ami = { 
-    "eu-west-1": { "pv": "ami-0c10417b" },
-    "eu-central-1": { "pv": "ami-b8cecaa5" },
-    "us-east-1": { "pv": "ami-3b73d350" },
+    "eu-west-1": { 
+      "pv": "ami-0c10417b" 
+    },
+
+    "eu-central-1": { 
+      "pv": "ami-b8cecaa5" 
+    },
+
+    "us-east-1": { 
+      'pv': 'ami-3b73d350',
+      'hvm': 'ami-3d73d356'
+    }
   }
 
   def __init__(self, region, key_name, security_groups):
     self.ec2 = aws.resource('ec2')
-    self.ami = self.coreos_ami[region]["pv"]
     self.key_name = key_name
+    self.region = region
     self.security_groups = security_groups 
 
   def launch(self, cluster_name, cloud_config, count = 1, instance_type = 'm1.small'):
+    image_type = 'hvm'
+    self.ami = self.coreos_ami[self.region][image_type]
+
     print("--> Creating %s instances" % count)
     instances = self.ec2.create_instances(
       ImageId=self.ami, 
@@ -29,7 +41,18 @@ class ClusterLauncher:
       InstanceType=instance_type,
       Monitoring={
         'Enabled': True
-      }
+      },
+
+      BlockDeviceMappings=[
+        {
+          'DeviceName': '/dev/sdb',
+          'Ebs': {
+            'VolumeSize': 100,
+            'VolumeType': 'gp2',
+            'DeleteOnTermination': True
+          }
+        }
+      ]
     )
 
     print("--> Tagging instances with cluster name '%s'" % cluster_name)

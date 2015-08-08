@@ -20,3 +20,16 @@
 ## Get cluster public DNS
 
     python3 op.py <cluster-name> dns
+
+## Mount the attached volume
+
+    sudo mkfs -t ext4 /dev/xvdh 
+    sudo mkdir /media/ebs1
+    sudo mount /dev/xvdh /media/ebs1/
+
+
+    vim /etc/fstab
+    
+    /dev/xvdh      /media/ebs1/  ext4    defaults,nofail        0       2
+
+    sudo mount -a

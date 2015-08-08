@@ -31,7 +31,8 @@ try:
   launcher.launch(
     args.cluster_name, 
     cloud_config, 
-    count = int(args.instances_count)
+    count = int(args.instances_count),
+    instance_type = 'c4.large'
   )
 
   instances = Cluster(aws.resource('ec2'), args.cluster_name).instances
@@ -40,4 +41,4 @@ try:
 except botocore.exceptions.WaiterError:
   print("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 
 except:
-  print("--x Unexpected error:", sys.exc_info()[0])
+  print("--x Unexpected error:", sys.exc_info())
