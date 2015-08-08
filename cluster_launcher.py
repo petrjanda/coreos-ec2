@@ -1,6 +1,7 @@
 import boto3 as aws
-import os, sys
-import argparse
+import os, sys, argparse, requests
+import http.client
+
 from cluster import Cluster
 
 class ClusterLauncher:
@@ -19,7 +20,13 @@ class ClusterLauncher:
     self.security_groups = security_groups 
 
   def launch(self, cluster_name, cloud_config, count = 1, instance_type = 'm1.small'):
-    print("Creating instances ...")
+    print("--> Getting discovery token")
+    token = self.get_discovery_token(count)
+
+    print("--> Updating cloud-config")
+    cloud_config = cloud_config.replace('$coreos_discovery_token', token)
+
+    print("--> Creating instances")
     instances = self.ec2.create_instances(
       ImageId=self.ami, 
       UserData=cloud_config,
@@ -33,7 +40,7 @@ class ClusterLauncher:
       }
     )
 
-    print("Tagging instances ...")
+    print("--> Tagging instances")
     for i, instance in enumerate(instances):
       instance.create_tags(
         Tags=[
@@ -42,8 +49,12 @@ class ClusterLauncher:
         ]
       )
 
-    print("Waiting for instances ...")
+    print("--> Waiting for instances")
     for i, instance in enumerate(instances):
       instance.wait_until_running()
 
     return Cluster(self.ec2, cluster_name)
+
+  def get_discovery_token(self, count):
+    return requests.get('https://discovery.etcd.io/new?size=' + str(count)).text
+
