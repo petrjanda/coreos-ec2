@@ -25,9 +25,6 @@ parser.add_argument("instances_count")
 parser.add_argument("cloud_config_path")
 args = parser.parse_args()
 
-# Launcher
-# default_security_group = 'sg-561fb433'
-
 region = os.getenv("AWS_DEFAULT_REGION")
 user_data = open(args.cloud_config_path).read()
 launcher = ClusterLauncher(aws, region, args.default_key_pair_name, [args.default_security_group])
