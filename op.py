@@ -1,10 +1,10 @@
 import boto3 as aws
 import os, sys
 import argparse
-import env
+import lib.env as env
 
-from cluster import Cluster
-from cluster_launcher import ClusterLauncher
+from lib.cluster import Cluster
+from lib.cluster_launcher import ClusterLauncher
 
 
 env.check()

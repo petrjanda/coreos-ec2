@@ -1,6 +1,6 @@
 import boto3 as aws
 
-from cluster import Cluster
+from .cluster import Cluster
 
 class ClusterLauncher:
   """ Cluster formation """
@@ -18,7 +18,7 @@ class ClusterLauncher:
     self.security_groups = security_groups 
 
   def launch(self, cluster_name, cloud_config, count = 1, instance_type = 'm1.small'):
-    print("--> Creating instances")
+    print("--> Creating %s instances" % count)
     instances = self.ec2.create_instances(
       ImageId=self.ami, 
       UserData=cloud_config,
@@ -32,7 +32,7 @@ class ClusterLauncher:
       }
     )
 
-    print("--> Tagging instances")
+    print("--> Tagging instances with cluster name '%s'" % cluster_name)
     for i, instance in enumerate(instances):
       instance.create_tags(
         Tags=[
@@ -41,7 +41,7 @@ class ClusterLauncher:
         ]
       )
 
-    print("--> Waiting for instances")
+    print("--> Waiting for instances to be in 'running' state")
     for i, instance in enumerate(instances):
       instance.wait_until_running()
 
