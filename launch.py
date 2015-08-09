@@ -1,4 +1,3 @@
-import boto3 as aws
 import os, sys, argparse, botocore
 import lib.env as env
 
@@ -34,7 +33,7 @@ try:
     instance_type = 'c4.large'
   )
 
-  instances = Cluster(aws.resource('ec2'), args.cluster_name).instances
+  instances = Cluster(args.cluster_name).instances
 
   print("--> " + str([i.public_dns_name for i in instances]))
 except botocore.exceptions.WaiterError:

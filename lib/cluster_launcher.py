@@ -69,7 +69,7 @@ class ClusterLauncher:
     for i, instance in enumerate(instances):
       instance.wait_until_running()
 
-    return Cluster(self.ec2, cluster_name)
+    return Cluster(cluster_name)
 
   def create_security_group(self, cluster_name):
     group = self.ec2.create_security_group(

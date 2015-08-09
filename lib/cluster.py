@@ -3,7 +3,7 @@ import boto3 as aws
 class Cluster:
   """ CoreOS cluster """
 
-  def __init__(self, ec2, name):
+  def __init__(self, name):
     self.name = name
     self.ec2 = aws.resource('ec2')
 
