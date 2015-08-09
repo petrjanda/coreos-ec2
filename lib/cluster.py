@@ -24,10 +24,23 @@ class Cluster:
     return list(statuses)[0]
 
   def terminate(self):
-    print('--> Stop instances')
+    print('--> Terminate instances')
     self.instances.terminate()
     for instance in self.instances:
       instance.wait_until_terminated()
+
+  def stop(self):
+    print('--> Stop instances')
+    self.instances.stop()
+    for instance in self.instances:
+      instance.wait_until_stopped()
+
+  def start(self):
+    print('--> Start instances')
+    self.instances.start()
+    for instance in self.instances:
+      instance.wait_until_started()
+
 
   def cleanup(self):
     print("--> Delete security group '%s'" % self.name)

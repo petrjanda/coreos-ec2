@@ -19,3 +19,9 @@ coreos:
         What=/dev/xvdb
         Where=/media/ebs
         Type=ext4
+    - name: flanneld.service
+      drop-ins:
+        - name: 50-network-config.conf
+          content: |
+            [Service]
+            ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
