@@ -28,6 +28,6 @@ elif args.op == "status":
   print([i.state['Name'] for i in cluster.instances])
 
 elif args.op == "cleanup":
-  confirm("You are about to terminate and remove the whole cluster")
+  confirm("You are about to terminate and remove the whole cluster.")
   cluster.terminate()
   cluster.cleanup()
