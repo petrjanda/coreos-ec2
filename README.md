@@ -1,4 +1,4 @@
-## Start a Cluster
+## Start a cluster
 
     python3 launch.py <cluster-name> <key-pair-name> <instance-count> <cloud-config-path> 
 
@@ -9,9 +9,9 @@
     --> Waiting for instances to be in 'running' state
     ['ec2-xx-x-xxx-xxx.compute-1.amazonaws.com', 'ec2-xx-x-xxx-xxx.compute-1.amazonaws.com'] 
 
-## Stop a Cluster
+## Terminate and cleanup a cluster
 
-    python3 op.py <cluster-name> terminate 
+    python3 op.py <cluster-name> cleanup
 
 ## Check cluster status
 
