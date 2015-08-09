@@ -5,7 +5,6 @@ import lib.env as env
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
 
-
 env.check()
 
 parser = argparse.ArgumentParser()
@@ -32,5 +31,3 @@ elif args.op == "cleanup":
   confirm("You are about to terminate and remove the whole cluster")
   cluster.terminate()
   cluster.cleanup()
-
-
