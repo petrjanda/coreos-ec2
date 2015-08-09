@@ -6,12 +6,13 @@ from .cluster import Cluster
 class ClusterLauncher:
   """ Cluster formation """
 
-  def __init__(self, key_name):
+  def __init__(self):
     self.ec2 = aws.resource('ec2')
-    self.key_name = key_name
 
   def launch(self, cluster_name, cloud_config, ami, count = 1, instance_type = 'm1.small'):
     group = self.create_security_group(cluster_name)
+
+    key_pair = self.create_key_pair(cluster_name).name
 
     logging.info("--> Creating %s instances of %s" % (count, ami))
     instances = self.ec2.create_instances(
@@ -19,7 +20,7 @@ class ClusterLauncher:
       UserData=cloud_config,
       MinCount=1, 
       MaxCount=count,
-      KeyName=self.key_name,
+      KeyName=key_name,
       SecurityGroupIds=[group.id],
       InstanceType=instance_type,
       Monitoring={
@@ -52,6 +53,15 @@ class ClusterLauncher:
       instance.wait_until_running()
 
     return Cluster(cluster_name)
+
+  def create_key_pair(self, cluster_name):
+    key_pair = self.ec2.create_key_pair(
+      KeyName = cluster_name
+    )
+
+    key_pair.save('./' + cluster_name + '.pem')
+
+    return key_pair
 
   def create_security_group(self, cluster_name):
     group = self.ec2.create_security_group(

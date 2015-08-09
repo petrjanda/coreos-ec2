@@ -11,7 +11,6 @@ env.check()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("cluster_name")
-parser.add_argument("default_key_pair_name")
 parser.add_argument("instances_count")
 parser.add_argument("cloud_config_path")
 args = parser.parse_args()
@@ -26,7 +25,7 @@ cloud_config = CloudConfig(
 ).with_new_token(args.instances_count)
 
 try:
-  launcher = ClusterLauncher(args.default_key_pair_name)
+  launcher = ClusterLauncher()
   ami = CoreOSAmi.get_ami(region, 'c4.large')
 
   launcher.launch(
