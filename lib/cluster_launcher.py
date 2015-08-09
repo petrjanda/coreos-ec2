@@ -9,10 +9,10 @@ class ClusterLauncher:
   def __init__(self):
     self.ec2 = aws.resource('ec2')
 
-  def launch(self, cluster_name, cloud_config, ami, count = 1, instance_type = 'm1.small'):
+  def launch(self, cluster_name, cloud_config, ami, key_pair_name, count = 1, instance_type = 'm1.small'):
     group = self.create_security_group(cluster_name)
 
-    key_pair = self.create_key_pair(cluster_name).name
+    # key_pair_name = self.create_key_pair(cluster_name).name
 
     logging.info("--> Creating %s instances of %s" % (count, ami))
     instances = self.ec2.create_instances(
@@ -20,7 +20,7 @@ class ClusterLauncher:
       UserData=cloud_config,
       MinCount=1, 
       MaxCount=count,
-      KeyName=key_name,
+      KeyName=key_pair_name,
       SecurityGroupIds=[group.id],
       InstanceType=instance_type,
       Monitoring={

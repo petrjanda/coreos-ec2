@@ -11,7 +11,9 @@ env.check()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("cluster_name")
+parser.add_argument("instance_type")
 parser.add_argument("instances_count")
+parser.add_argument("key_pair_name")
 parser.add_argument("cloud_config_path")
 args = parser.parse_args()
 
@@ -26,14 +28,15 @@ cloud_config = CloudConfig(
 
 try:
   launcher = ClusterLauncher()
-  ami = CoreOSAmi.get_ami(region, 'c4.large')
+  ami = CoreOSAmi.get_ami(region, args.instance_type)
 
   launcher.launch(
     args.cluster_name, 
     cloud_config, 
     ami,
+    args.key_pair_name,
     count = int(args.instances_count),
-    instance_type = 'c4.large'
+    instance_type = args.instance_type
   )
 
   instances = Cluster(args.cluster_name).instances

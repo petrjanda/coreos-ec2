@@ -1,40 +1,37 @@
 ## Start a cluster
 
-    python3 launch.py <cluster-name> <key-pair-name> <instance-count> <cloud-config-path> 
+Cluster of `N` nodes will be started with EBS volume attached and mounted. All nodes will be connected to
+single cluster with unique discovery token and EC2 security group.
 
-    ➜  python-ec2 git:(master) ✗ python3 launch.py s-1 xxx 2 ./config/cloud-config.example
-    --> Fetching CoreOS etcd discovery token
-    --> Creating 2 instances
-    --> Tagging instances with cluster name 's-1'
-    --> Waiting for instances to be in 'running' state
-    ['ec2-xx-x-xxx-xxx.compute-1.amazonaws.com', 'ec2-xx-x-xxx-xxx.compute-1.amazonaws.com'] 
+Replace <xxx> by appropriate key-pair name:
 
-## Terminate and cleanup a cluster
+    (venv)➜  python-ec2 git:(master) ✗ python3 launch.py p-1 c4.large 2 <xxx> ./config/cloud-config.example
+    INFO: --> Fetching CoreOS etcd discovery token
+    INFO: --> Creating 2 instances of ami-3d73d356
+    INFO: --> Tagging instances with cluster name 'p-1'
+    INFO: --> Waiting for instances to be in 'running' state
+    INFO: --> ['ec2-54-86-26-171.compute-1.amazonaws.com', 'ec2-52-4-163-190.compute-1.amazonaws.com']
+
+    # Get DNS
+    (venv)➜  python-ec2 git:(master) ✗ python3 op.py p-1 dns
+    ['ec2-54-86-26-171.compute-1.amazonaws.com', 'ec2-52-4-163-190.compute-1.amazonaws.com']
+
+    # Get status
+    (venv)➜  python-ec2 git:(master) ✗ python3 op.py p-1 status
+    ['running', 'running']
+
+    # Cleanup
+    (venv)➜  python-ec2 git:(master) ✗ python3 op.py p-1 cleanup
+    You are about to terminate and remove the whole cluster Are you sure? y/n y
+    --> Stop instances
+    --> Delete security group 'p-1'
+
+## Cluster ops 
 
     python3 op.py <cluster-name> cleanup
-
-## Check cluster status
-
     python3 op.py <cluster-name> status
-
-## Get cluster public DNS
-
     python3 op.py <cluster-name> dns
 
 ## Mount the attached volume
 
 Your attached volume is automatically mounted in `/media/ebs` (as specified in `cloud-config`).
-
-Manually:
-
-    lsblk
-    sudo mkfs -t ext4 /dev/xvdh 
-    sudo mkdir /media/ebs1
-    sudo mount /dev/xvdh /media/ebs1/
-
-
-Fstab:
-
-    vim /etc/fstab
-    # /dev/xvdh      /media/ebs1/  ext4    defaults,nofail        0       2
-    sudo mount -a
