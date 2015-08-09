@@ -30,7 +30,7 @@ coreos:
         Type=oneshot
         RemainAfterExit=yes
         ExecStart=/usr/sbin/wipefs -f /dev/xvdb
-        ExecStart=/usr/sbin/mkfs.ext4 -f /dev/xvdb
+        ExecStart=/usr/sbin/mkfs -f ext4 /dev/xvdb
 
     - name: media-ebs.mount
       command: start
