@@ -3,7 +3,7 @@
 Cluster of `N` nodes will be started with EBS volume attached and mounted. All nodes will be connected to
 single cluster with unique discovery token and EC2 security group.
 
-Replace <xxx> by appropriate key-pair name:
+Replace `xxx` by appropriate key-pair name:
 
     (venv)➜  python-ec2 git:(master) ✗ python3 launch.py p-1 c4.large 2 <xxx> ./config/cloud-config.example
     INFO: --> Fetching CoreOS etcd discovery token
@@ -32,6 +32,6 @@ Replace <xxx> by appropriate key-pair name:
     python3 op.py <cluster-name> status
     python3 op.py <cluster-name> dns
 
-## Mount the attached volume
+## Attached volume
 
-Your attached volume is automatically mounted in `/media/ebs` (as specified in `cloud-config`).
+Your attached volume is automatically mounted in `/media/ebs` using `ext4` file system (as specified in `cloud-config`).
