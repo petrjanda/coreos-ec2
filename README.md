@@ -35,3 +35,19 @@ Replace `xxx` by appropriate key-pair name:
 ## Attached volume
 
 Your attached volume is automatically mounted in `/media/ebs` using `ext4` file system (as specified in `cloud-config`).
+
+You can verify it if you SSH to your instance and run the `lsblk` command:
+
+    core@ip-172-31-47-145 ~ $ lsblk
+    NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+    xvda    202:0    0    8G  0 disk
+    |-xvda1 202:1    0  128M  0 part
+    |-xvda2 202:2    0    2M  0 part
+    |-xvda3 202:3    0    1G  0 part /usr
+    |-xvda4 202:4    0    1G  0 part
+    |-xvda6 202:6    0  128M  0 part /usr/share/oem
+    |-xvda7 202:7    0   64M  0 part
+    `-xvda9 202:9    0  5.7G  0 part /
+    xvdb    202:16   0  100G  0 disk /media/ebs
+
+As you can see `/dev/xvdb` is mounted at `/media/ebs` correctly.
