@@ -20,15 +20,30 @@ class ClusterLauncher:
     }
   }
 
-  def __init__(self, region, key_name, security_groups):
+  def __init__(self, region, key_name):
     self.ec2 = aws.resource('ec2')
     self.key_name = key_name
     self.region = region
-    self.security_groups = security_groups 
 
   def launch(self, cluster_name, cloud_config, count = 1, instance_type = 'm1.small'):
     image_type = 'hvm'
     self.ami = self.coreos_ami[self.region][image_type]
+
+    group = self.ec2.create_security_group(
+      GroupName = cluster_name,
+      Description = cluster_name + ' security'
+    )
+
+    group.authorize_ingress(
+      SourceSecurityGroupName = cluster_name
+    )
+
+    group.authorize_ingress(
+      IpProtocol = 'tcp',
+      FromPort = 22,
+      ToPort = 22,
+      CidrIp = '0.0.0.0/0'
+    )
 
     print("--> Creating %s instances" % count)
     instances = self.ec2.create_instances(
@@ -37,7 +52,7 @@ class ClusterLauncher:
       MinCount=1, 
       MaxCount=count,
       KeyName=self.key_name,
-      SecurityGroupIds=self.security_groups,
+      SecurityGroupIds=[group.id],
       InstanceType=instance_type,
       Monitoring={
         'Enabled': True

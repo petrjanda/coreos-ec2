@@ -25,6 +25,10 @@ class Cluster:
 
   def terminate(self):
     self.instances.terminate()
+    for i in self.instances:
+      instance.wait_until_terminated()
+
+    self.ec2.SecurityGroup(self.name).delete()
 
   def find_instances(self):
     return self.ec2.instances.filter(
