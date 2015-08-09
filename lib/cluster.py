@@ -12,11 +12,16 @@ class Cluster:
     if not self.exists():
       raise Exception("Cluster %s doesn't exist!" % self.name)
 
-    return self.find_instances()
+    return self.ec2.instances.filter(
+      Filters=[
+        {'Name': 'tag-key', 'Values': ['Cluster']},
+        {'Name': 'tag-value', 'Values': [self.name]},
+      ]
+    )
 
   @property
   def status(self):
-    statuses = set([i.state['Name'] for i in list(self.find_instances())])
+    statuses = set([i.state['Name'] for i in list(self.instances)])
 
     if(len(statuses) > 1):
       raise Exception("Cluster in inconsistent state '%s'!" % statuses)
@@ -57,11 +62,5 @@ class Cluster:
     )
     
   def exists(self):
-    return len(list(self.ec2.instances.filter(
-      Filters=[
-        {'Name': 'tag-key', 'Values': ['Cluster']},
-        {'Name': 'tag-value', 'Values': [self.name]},
-#        {'Name': 'instance-state-name', 'Values': ['running']}
-      ]
-    ))) > 0
+    return len(list(self.instances)) > 0
 

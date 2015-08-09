@@ -44,5 +44,3 @@ try:
   logging.info("--> " + str([i.public_dns_name for i in instances]))
 except botocore.exceptions.WaiterError:
   logging.error("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 
-except:
-  logging.error("--x Unexpected error:", sys.exc_info())
