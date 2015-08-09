@@ -1,9 +1,11 @@
 import os, sys, argparse, botocore
 import lib.env as env
+import logging
 
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
 from lib.cloud_config import CloudConfig
+from lib.coreos import Ami as CoreOSAmi
 
 env.check()
 
@@ -16,27 +18,29 @@ args = parser.parse_args()
 
 region = os.getenv("AWS_DEFAULT_REGION")
 
-print("--> Fetching CoreOS etcd discovery token")
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
+logging.info("--> Fetching CoreOS etcd discovery token")
 cloud_config = CloudConfig(
   open(args.cloud_config_path).read()
 ).with_new_token(args.instances_count)
 
-launcher = ClusterLauncher(
-  region, args.default_key_pair_name
-)
-
 try:
+  launcher = ClusterLauncher(args.default_key_pair_name)
+  ami = CoreOSAmi.get_ami(region, 'c4.large')
+
   launcher.launch(
     args.cluster_name, 
     cloud_config, 
+    ami,
     count = int(args.instances_count),
     instance_type = 'c4.large'
   )
 
   instances = Cluster(args.cluster_name).instances
 
-  print("--> " + str([i.public_dns_name for i in instances]))
+  logging.info("--> " + str([i.public_dns_name for i in instances]))
 except botocore.exceptions.WaiterError:
-  print("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 
+  logging.error("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 
 except:
-  print("--x Unexpected error:", sys.exc_info())
+  logging.error("--x Unexpected error:", sys.exc_info())

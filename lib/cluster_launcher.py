@@ -1,37 +1,19 @@
 import boto3 as aws
+import logging
 
 from .cluster import Cluster
 
 class ClusterLauncher:
   """ Cluster formation """
 
-  coreos_ami = { 
-    "eu-west-1": { 
-      "pv": "ami-0c10417b" 
-    },
-
-    "eu-central-1": { 
-      "pv": "ami-b8cecaa5" 
-    },
-
-    "us-east-1": { 
-      'pv': 'ami-3b73d350',
-      'hvm': 'ami-3d73d356'
-    }
-  }
-
-  def __init__(self, region, key_name):
+  def __init__(self, key_name):
     self.ec2 = aws.resource('ec2')
     self.key_name = key_name
-    self.region = region
 
-
-  def launch(self, cluster_name, cloud_config, count = 1, instance_type = 'm1.small'):
-    image_type = 'hvm'
-    ami = self.coreos_ami[self.region][image_type]
+  def launch(self, cluster_name, cloud_config, ami, count = 1, instance_type = 'm1.small'):
     group = self.create_security_group(cluster_name)
 
-    print("--> Creating %s instances" % count)
+    logging.info("--> Creating %s instances of %s" % (count, ami))
     instances = self.ec2.create_instances(
       ImageId=ami, 
       UserData=cloud_config,
@@ -56,7 +38,7 @@ class ClusterLauncher:
       ]
     )
 
-    print("--> Tagging instances with cluster name '%s'" % cluster_name)
+    logging.info("--> Tagging instances with cluster name '%s'" % cluster_name)
     for i, instance in enumerate(instances):
       instance.create_tags(
         Tags=[
@@ -65,7 +47,7 @@ class ClusterLauncher:
         ]
       )
 
-    print("--> Waiting for instances to be in 'running' state")
+    logging.info("--> Waiting for instances to be in 'running' state")
     for i, instance in enumerate(instances):
       instance.wait_until_running()
 
