@@ -25,29 +25,15 @@ class ClusterLauncher:
     self.key_name = key_name
     self.region = region
 
+
   def launch(self, cluster_name, cloud_config, count = 1, instance_type = 'm1.small'):
     image_type = 'hvm'
-    self.ami = self.coreos_ami[self.region][image_type]
-
-    group = self.ec2.create_security_group(
-      GroupName = cluster_name,
-      Description = cluster_name + ' security'
-    )
-
-    group.authorize_ingress(
-      SourceSecurityGroupName = cluster_name
-    )
-
-    group.authorize_ingress(
-      IpProtocol = 'tcp',
-      FromPort = 22,
-      ToPort = 22,
-      CidrIp = '0.0.0.0/0'
-    )
+    ami = self.coreos_ami[self.region][image_type]
+    group = self.create_security_group(cluster_name)
 
     print("--> Creating %s instances" % count)
     instances = self.ec2.create_instances(
-      ImageId=self.ami, 
+      ImageId=ami, 
       UserData=cloud_config,
       MinCount=1, 
       MaxCount=count,
@@ -85,4 +71,21 @@ class ClusterLauncher:
 
     return Cluster(self.ec2, cluster_name)
 
+  def create_security_group(self, cluster_name):
+    group = self.ec2.create_security_group(
+      GroupName = cluster_name,
+      Description = cluster_name + ' security'
+    )
 
+    group.authorize_ingress(
+      SourceSecurityGroupName = cluster_name
+    )
+
+    group.authorize_ingress(
+      IpProtocol = 'tcp',
+      FromPort = 22,
+      ToPort = 22,
+      CidrIp = '0.0.0.0/0'
+    )
+
+    return group
