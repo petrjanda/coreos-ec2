@@ -12,3 +12,10 @@ coreos:
       command: start
     - name: fleet.service
       command: start
+    - name: media-ebs.mount
+      command: start
+      content: |
+        [Mount]
+        What=/dev/xvdb
+        Where=/media/ebs
+        Type=ext4

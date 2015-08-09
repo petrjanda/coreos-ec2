@@ -23,13 +23,18 @@
 
 ## Mount the attached volume
 
+Your attached volume is automatically mounted in `/media/ebs` (as specified in `cloud-config`).
+
+Manually:
+
+    lsblk
     sudo mkfs -t ext4 /dev/xvdh 
     sudo mkdir /media/ebs1
     sudo mount /dev/xvdh /media/ebs1/
 
 
-    vim /etc/fstab
-    
-    /dev/xvdh      /media/ebs1/  ext4    defaults,nofail        0       2
+Fstab:
 
+    vim /etc/fstab
+    # /dev/xvdh      /media/ebs1/  ext4    defaults,nofail        0       2
     sudo mount -a
