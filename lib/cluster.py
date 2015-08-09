@@ -24,11 +24,15 @@ class Cluster:
     return list(statuses)[0]
 
   def terminate(self):
+    print('--> Stop instances')
     self.instances.terminate()
-    for i in self.instances:
+    for instance in self.instances:
       instance.wait_until_terminated()
 
-    self.ec2.SecurityGroup(self.name).delete()
+    print("--> Delete security group '%s'" % self.name)
+    aws.client('ec2').delete_security_group(
+      GroupName = self.name
+    )
 
   def find_instances(self):
     return self.ec2.instances.filter(
