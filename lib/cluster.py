@@ -29,6 +29,7 @@ class Cluster:
     for instance in self.instances:
       instance.wait_until_terminated()
 
+  def cleanup(self):
     print("--> Delete security group '%s'" % self.name)
     aws.client('ec2').delete_security_group(
       GroupName = self.name

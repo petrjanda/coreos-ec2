@@ -20,5 +20,6 @@ if args.op == "dns":
   print([i.public_dns_name for i in cluster.instances])
 elif args.op == "status":
   print([i.state['Name'] for i in cluster.instances])
-elif args.op == "terminate":
+elif args.op == "terminatecleanup":
   cluster.terminate()
+  cluster.cleanup()
