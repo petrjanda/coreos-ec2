@@ -111,7 +111,7 @@ Once your cluster is started, you can verify presence of your volume with `lsblk
     `-xvda9 202:9    0  5.7G  0 part /
     xvdb    202:16   0  100G  0 disk /media/ebs
 
-As you can see `/dev/xvdb` is mounted at `/media/ebs` correctly.
+As you can see `/dev/xvdb` is mounted at `/media/ebs` correctly. See more at http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html.
 
 ## Start a cluster
 
