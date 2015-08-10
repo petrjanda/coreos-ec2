@@ -17,7 +17,7 @@ identical.
 
 There are several important changes in our `config/cloud-config.example`:
 
-1. ETCD
+  1. ETCD
 
 ETCD needs a discovery token to be able to find other instances within the cluster. By default its on you to fetch
 a new token when you're starting a cluster although we've included this step into the solution.
@@ -31,7 +31,7 @@ The `$coreos_discovery_token` isn't part of CoreOS cloud-config by default, but 
 replaced by unique ETCD discovery token automatically. If this isn't what you want, feel free to use any arbitrary
 value here, which means you don't have to use the automatically created one.
 
-2. Flannel
+  2. Flannel
 
 Flannel is the virtual networking layer within the CoreOS cluster. It provides a mechanism, which will allow
 docker to assign unique IP address to every running docker container. This not only greatly simpifies the operations
@@ -47,7 +47,7 @@ start a unit which would specify Flannel's network address range:
             [Service]
             ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{ "Network": "10.1.0.0/16" }'
 
-3. Mounted volume
+  3. Mounted volume
 
 By default, we've provided one mounted volume of EBS. Its created alongside the machine itself and by default is
 specified to be attached as `/dev/sbd`. 
