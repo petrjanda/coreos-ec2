@@ -1,6 +1,10 @@
 import os, sys, argparse, botocore, utils, logging
 import lib.env as env
+import paramiko, base64
 
+from paramiko import SSHClient
+from scp import SCPClient
+ 
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
 from lib.cloud_config import CloudConfig
@@ -22,6 +26,10 @@ parser_launch.add_argument("instance_type")
 parser_launch.add_argument("instances_count")
 parser_launch.add_argument("key_pair_name")
 parser_launch.add_argument("cloud_config_path")
+
+parser_start = subparsers.add_parser('start')
+parser_stop = subparsers.add_parser('stop')
+parser_cleanup = subparsers.add_parser('cleanup')
 
 args = parser.parse_args()
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -68,11 +76,7 @@ elif args.op == "start":
     cluster.start()
 
 elif args.op == 'scp':
-    import paramiko, base64
-    from paramiko import SSHClient
-    from scp import SCPClient
-
-    dns_name = list(cluster.instances)[0].public_dns_name
+   dns_name = list(cluster.instances)[0].public_dns_name
     key = paramiko.RSAKey.from_private_key_file(args.key_pair_path)
 
     ssh = SSHClient()
