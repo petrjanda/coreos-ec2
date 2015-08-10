@@ -76,7 +76,7 @@ elif args.op == "start":
     cluster.start()
 
 elif args.op == 'scp':
-   dns_name = list(cluster.instances)[0].public_dns_name
+    dns_name = list(cluster.instances)[0].public_dns_name
     key = paramiko.RSAKey.from_private_key_file(args.key_pair_path)
 
     ssh = SSHClient()
