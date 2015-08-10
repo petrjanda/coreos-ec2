@@ -11,6 +11,9 @@ tasks:
 
 ## Configuration
 
+To start a CoreOS cluster, you have to choose appropriate Amazon EC2 Ami. This is done automatically by us depending
+on your region and instance type according to (https://coreos.com/os/docs/latest/booting-on-ec2.html).
+
 As any other CoreOS cluster, we're using `cloud-config` file to initiate each cluster node. As the `cloud-config`
 is passed to each EC2 node as the `user-data` upon creation, we ensure that all initial cluster machines are
 identical.
@@ -33,7 +36,7 @@ value here, which means you don't have to use the automatically created one.
 
 ### Flannel
 
-Flannel is the virtual networking layer within the CoreOS cluster. It provides a mechanism, which will allow
+Flannel (https://coreos.com/flannel/docs/latest/flannel-config.html) is the virtual networking layer within the CoreOS cluster. It provides a mechanism, which will allow
 docker to assign unique IP address to every running docker container. This not only greatly simpifies the operations
 (avoid unnecessary port binding and exposing) but it also goes along more high level clustering management
 solutions like Kubernetes. As flannel is very well integrated with the CoreOS, only necessary config change is to
