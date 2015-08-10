@@ -56,7 +56,6 @@ elif args.op == 'launch':
         logging.info("--> " + str([i.public_dns_name for i in instances]))
     except botocore.exceptions.WaiterError:
         logging.error("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 
-    finally:
         cluster.cleanup()
 
 elif args.op == "status":
