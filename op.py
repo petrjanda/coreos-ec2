@@ -10,9 +10,14 @@ env.check()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("cluster_name")
-parser.add_argument("op")
-args = parser.parse_args()
+subparsers = parser.add_subparsers(dest='op')
 
+parser_scp =  subparsers.add_parser('scp')
+parser_scp.add_argument('key_pair_path')
+parser_scp.add_argument('from_path')
+parser_scp.add_argument('to_path')
+
+args = parser.parse_args()
 cluster = Cluster(args.cluster_name)
 
 if args.op == "dns":
@@ -33,16 +38,14 @@ elif args.op == 'scp':
     from scp import SCPClient
 
     dns_name = list(cluster.instances)[0].public_dns_name
-    key = paramiko.RSAKey.from_private_key_file(
-        '/Users/petr/Downloads/gwi-us-east.pem'
-    )
+    key = paramiko.RSAKey.from_private_key_file(args.key_pair_path)
 
     ssh = SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(hostname = dns_name, username = 'core', pkey = key)
 
     scp = SCPClient(ssh.get_transport())
-    scp.put('op.py', 'op.py')
+    scp.put(args.from_path, args.to_path)
     scp.close()
 
 elif args.op == "cleanup":
