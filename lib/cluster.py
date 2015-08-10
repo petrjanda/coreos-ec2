@@ -41,7 +41,7 @@ class Cluster:
         print('--> Start instances')
         self.instances.start()
         for instance in self.instances:
-            instance.wait_until_started()
+            instance.wait_until_running()
 
     def cleanup(self):
         print("--> Delete security group '%s'" % self.name)

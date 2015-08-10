@@ -8,6 +8,7 @@ class ClusterLauncher:
 
   def __init__(self):
       self.ec2 = aws.resource('ec2')
+      self.client = aws.client('ec2')
 
   def launch(self, cluster_name, cloud_config, ami, key_pair_name, count = 1, instance_type = 'm1.small'):
       group = self.create_security_group(cluster_name)
@@ -51,6 +52,17 @@ class ClusterLauncher:
       logging.info("--> Waiting for instances to be in 'running' state")
       for i, instance in enumerate(instances):
           instance.wait_until_running()
+
+      logging.info("--> Creating IP addresses")
+      for instance in instances:
+          ip_address = self.client.allocate_address(
+              Domain = 'standard'
+          )
+
+          self.client.associate_address(
+              InstanceId = instance.id,
+              PublicIp = ip_address['PublicIp']
+          )
 
       return Cluster(cluster_name)
 

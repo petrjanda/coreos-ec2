@@ -30,8 +30,9 @@ parser_launch.add_argument("cloud_config_path")
 parser_start = subparsers.add_parser('start')
 parser_stop = subparsers.add_parser('stop')
 parser_cleanup = subparsers.add_parser('cleanup')
-parser_cleanup = subparsers.add_parser('status')
-parser_cleanup = subparsers.add_parser('dns')
+parser_status = subparsers.add_parser('status')
+parser_dns = subparsers.add_parser('dns')
+parser_ip = subparsers.add_parser('ip')
 
 args = parser.parse_args()
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -39,10 +40,7 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 region = os.getenv("AWS_DEFAULT_REGION")
 cluster = Cluster(args.cluster_name)
 
-if args.op == "dns":
-    print([i.public_dns_name for i in cluster.instances])
-
-elif args.op == 'launch':
+if args.op == 'launch':
     logging.info("--> Fetching CoreOS etcd discovery token")
     cloud_config = CloudConfig(
         open(args.cloud_config_path).read()
@@ -71,6 +69,12 @@ elif args.op == 'launch':
 
 elif args.op == "status":
     print(cluster.status)
+
+elif args.op == "dns":
+    print([i.public_dns_name for i in cluster.instances])
+
+elif args.op == "ip":
+    print([i.public_ip_address for i in cluster.instances])
 
 elif args.op == "stop":
     cluster.stop()
