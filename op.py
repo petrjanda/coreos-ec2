@@ -30,6 +30,8 @@ parser_launch.add_argument("cloud_config_path")
 parser_start = subparsers.add_parser('start')
 parser_stop = subparsers.add_parser('stop')
 parser_cleanup = subparsers.add_parser('cleanup')
+parser_cleanup = subparsers.add_parser('status')
+parser_cleanup = subparsers.add_parser('dns')
 
 args = parser.parse_args()
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -64,6 +66,7 @@ elif args.op == 'launch':
         logging.info("--> " + str([i.public_dns_name for i in instances]))
     except botocore.exceptions.WaiterError:
         logging.error("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 
+        cluster.terminate()
         cluster.cleanup()
 
 elif args.op == "status":
