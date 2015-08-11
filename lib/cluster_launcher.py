@@ -10,35 +10,20 @@ class ClusterLauncher:
       self.ec2 = aws.resource('ec2')
       self.client = aws.client('ec2')
 
-  def launch(self, cluster_name, cloud_config, ami, key_pair_name, count = 1, instance_type = 'm1.small'):
+  def launch(self, conf):
+      cluster_name = conf.cluster_name
+      count = conf.instances_count
+      instance_type = conf.instance_type
+
       group = self.create_security_group(cluster_name)
 
       # key_pair_name = self.create_key_pair(cluster_name).name
 
-      logging.info("--> Creating %s instances of %s" % (count, ami))
-      instances = self.ec2.create_instances(
-          ImageId=ami, 
-          UserData=cloud_config,
-          MinCount=1, 
-          MaxCount=count,
-          KeyName=key_pair_name,
-          SecurityGroupIds=[group.id],
-          InstanceType=instance_type,
-          Monitoring={
-              'Enabled': True
-          },
+      instance_props = conf.props
+      instance_props['SecurityGroupIds'] = [group.id]
 
-          BlockDeviceMappings=[
-              {
-                  'DeviceName': '/dev/sdb',
-                  'Ebs': {
-                      'VolumeSize': 100,
-                      'VolumeType': 'gp2',
-                      'DeleteOnTermination': True
-                  }
-              }
-          ]
-      )
+      logging.info("--> Creating instances")
+      instances = self.ec2.create_instances(**instance_props)
 
       logging.info("--> Tagging instances with cluster name '%s'" % cluster_name)
       for i, instance in enumerate(instances):

@@ -8,6 +8,7 @@ from scp import SCPClient
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
 from lib.cloud_config import CloudConfig
+from lib.cluster_conf import ClusterConf
 from lib.coreos import get_ami
 
 env.check()
@@ -50,14 +51,20 @@ if args.op == 'launch':
         launcher = ClusterLauncher()
         ami = get_ami(region, args.instance_type)
 
-        launcher.launch(
-            args.cluster_name, 
-            cloud_config, 
-            ami,
-            args.key_pair_name,
-            count = int(args.instances_count),
+        conf = ClusterConf(
+            args.cluster_name, ami, args.key_pair_name,
+            user_data = cloud_config,
+            instances_count = int(args.instances_count),
             instance_type = args.instance_type
+        ) \
+        .volume(
+            name = '/dev/sdb', 
+            size = 100, 
+            volume_type = 'gp2', 
+            delete_on_termination = True
         )
+ 
+        launcher.launch(conf)
 
         instances = Cluster(args.cluster_name).instances
 
