@@ -38,16 +38,17 @@ class ClusterLauncher:
       for i, instance in enumerate(instances):
           instance.wait_until_running()
 
-      logging.info("--> Creating IP addresses")
-      for instance in instances:
-          ip_address = self.client.allocate_address(
-              Domain = 'standard'
-          )
+      if(conf.allocate_ip_address is True):
+          logging.info("--> Creating IP addresses")
+          for instance in instances:
+              ip_address = self.client.allocate_address(
+                  Domain = 'standard'
+              )
 
-          self.client.associate_address(
-              InstanceId = instance.id,
-              PublicIp = ip_address['PublicIp']
-          )
+              self.client.associate_address(
+                  InstanceId = instance.id,
+                  PublicIp = ip_address['PublicIp']
+              )
 
       return Cluster(cluster_name)
 

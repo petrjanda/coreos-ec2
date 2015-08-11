@@ -1,11 +1,12 @@
 class ClusterConf:
-    def __init__(self, cluster_name, ami, key_pair_name, user_data = '', instance_type = 'm1.small', instances_count = 1):
+    def __init__(self, cluster_name, ami, key_pair_name, user_data = '', instance_type = 'm1.small', instances_count = 1, allocate_ip_address = False):
         self._cluster_name = cluster_name
         self._ami = ami
         self._user_data = user_data
         self._key_pair_name = key_pair_name
         self._instance_type = instance_type 
         self._instances_count = instances_count
+        self._allocate_ip_address = allocate_ip_address
         self._volumes = []
 
     @property
@@ -27,6 +28,10 @@ class ClusterConf:
     @property
     def instances_count(self):
         return self._instances_count
+
+    @property
+    def allocate_ip_address(self):
+        return self._allocate_ip_address
 
     @property
     def block_device_mappings(self):

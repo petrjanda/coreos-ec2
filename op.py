@@ -55,7 +55,8 @@ if args.op == 'launch':
             args.cluster_name, ami, args.key_pair_name,
             user_data = cloud_config,
             instances_count = int(args.instances_count),
-            instance_type = args.instance_type
+            instance_type = args.instance_type,
+            allocate_ip_address = False
         ) \
         .volume(
             name = '/dev/sdb', 
