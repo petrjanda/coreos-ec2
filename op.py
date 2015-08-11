@@ -8,7 +8,7 @@ from scp import SCPClient
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
 from lib.cloud_config import CloudConfig
-from lib.coreos import Ami as CoreOSAmi
+from lib.coreos import get_ami
 
 env.check()
 
@@ -48,7 +48,7 @@ if args.op == 'launch':
 
     try:
         launcher = ClusterLauncher()
-        ami = CoreOSAmi.get_ami(region, args.instance_type)
+        ami = get_ami(region, args.instance_type)
 
         launcher.launch(
             args.cluster_name, 

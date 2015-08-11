@@ -18,9 +18,7 @@ image_types = {
     'c4': 'hvm'
 }
 
-class Ami:
-    @staticmethod
-    def get_ami(region, instance_type):
-        image_type = image_types[instance_type.split('.')[0]]
+def get_ami(region, instance_type):
+    image_type = image_types[instance_type.split('.')[0]]
 
-        return coreos_ami[region][image_type]
+    return coreos_ami[region][image_type]
