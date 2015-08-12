@@ -63,6 +63,11 @@ class ClusterLauncher:
     return key_pair
 
   def create_security_group(self, **kwargs):
+      if(kwargs['name']): # <<< if only name
+          return self.ec2.security_group(
+              Name = kwargs['name']
+          )
+
       group = self.ec2.create_security_group(
           GroupName = kwargs['name'],
           Description = kwargs['name'] + ' security'
