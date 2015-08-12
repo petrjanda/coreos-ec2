@@ -1,5 +1,6 @@
 import boto3 as aws
 import logging
+import create_security_group, find_security_group from lib.security_group
 
 from .cluster import Cluster
 
@@ -64,26 +65,8 @@ class ClusterLauncher:
 
   def create_security_group(self, **kwargs):
       if(kwargs['name']): # <<< if only name
-          return self.ec2.security_group(
+          find_security_group(
               Name = kwargs['name']
           )
 
-      group = self.ec2.create_security_group(
-          GroupName = kwargs['name'],
-          Description = kwargs['name'] + ' security'
-      )
-
-      if(kwargs['allow_all_own_traffic'] is True):
-          group.authorize_ingress(
-              SourceSecurityGroupName = cluster_name
-          )
-
-      for inbound in kwargs['allow_inbound']:
-          group.authorize_ingress(
-              IpProtocol = inbound['protocol'],
-              FromPort = inbound['from_port'],
-              ToPort = inbound['to_port'],
-              CidrIp = inbound['ip']
-          )
-
-      return group
+      return create_security_group(kwargs)
