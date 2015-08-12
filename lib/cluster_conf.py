@@ -74,12 +74,21 @@ class ClusterConf:
 
     def security_group(self, name):
         # name required (only)
-        self._security_groups.append({name: name})
+        self._security_groups.append({'name': name, 'action': 'find'})
 
         return self
 
     def create_security_group(self, **kwargs):
         # name required 
+        kwargs['action'] = 'create'
+        self._security_groups.append(kwargs)
+
+        return self
+
+
+    def find_or_create_security_group(self, **kwargs):
+        # name required 
+        kwargs['action'] = 'find-create'
         self._security_groups.append(kwargs)
 
         return self

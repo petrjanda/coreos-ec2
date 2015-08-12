@@ -1,6 +1,8 @@
 import boto3 as aws
+import botocore, sys
+
 import logging
-from lib.security_group import create_security_group, find_security_group
+from lib.security_group import create_security_group, find_security_group, find_security_group_by_name
 
 from .cluster import Cluster
 
@@ -63,10 +65,16 @@ class ClusterLauncher:
 
     return key_pair
 
-  def create_security_group(self, **kwargs):
-      if(kwargs['name']): # <<< if only name
-          find_security_group(
-              Name = kwargs['name']
-          )
+  def create_security_group(self, kwargs):
+      if(kwargs['action'] == 'find'):
+          return find_security_group(kwargs['name'])
 
-      return create_security_group(kwargs)
+      elif(kwargs['action'] == 'find-create'):
+          group = find_security_group_by_name(kwargs['name'])
+
+          if(group is None):
+              return create_security_group(kwargs)
+
+          return group
+      else:
+          return create_security_group(kwargs)
