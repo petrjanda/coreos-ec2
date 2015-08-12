@@ -17,6 +17,15 @@ def create_security_group(kwargs):
             SourceSecurityGroupName = kwargs['name']
         )
 
+    if('allow_ssh_from' in kwargs):
+        group.authorize_ingress(
+            IpProtocol = 'tcp',
+            FromPort = 22,
+            ToPort = 22,
+            CidrIp = kwargs['allow_ssh_from']
+        )
+
+
     if('allow_inbound' in kwargs):
         for inbound in kwargs['allow_inbound']:
             group.authorize_ingress(

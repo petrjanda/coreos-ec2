@@ -73,7 +73,7 @@ if args.op == 'launch':
         ) \
         .create_security_group(
             name = args.cluster_name,
-            allow_ssh = True,
+            allow_ssh_from = '0.0.0.0/0',
             allow_all_own_traffic = True
         )
 
