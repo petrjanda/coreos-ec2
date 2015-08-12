@@ -15,12 +15,13 @@ class ClusterLauncher:
       count = conf.instances_count
       instance_type = conf.instance_type
 
-      group = self.create_security_group(cluster_name)
+      groups = [self.create_security_group(g) for g in conf.security_groups]
+      group_ids = [g.id for g in groups]
 
       # key_pair_name = self.create_key_pair(cluster_name).name
 
       instance_props = conf.props
-      instance_props['SecurityGroupIds'] = [group.id]
+      instance_props['SecurityGroupIds'] = group_ids
 
       logging.info("--> Creating instances")
       instances = self.ec2.create_instances(**instance_props)
@@ -61,21 +62,23 @@ class ClusterLauncher:
 
     return key_pair
 
-  def create_security_group(self, cluster_name):
+  def create_security_group(self, **kwargs):
       group = self.ec2.create_security_group(
-          GroupName = cluster_name,
-          Description = cluster_name + ' security'
+          GroupName = kwargs['name'],
+          Description = kwargs['name'] + ' security'
       )
 
-      group.authorize_ingress(
-          SourceSecurityGroupName = cluster_name
-      )
+      if(kwargs['allow_all_own_traffic'] is True):
+          group.authorize_ingress(
+              SourceSecurityGroupName = cluster_name
+          )
 
-      group.authorize_ingress(
-          IpProtocol = 'tcp',
-          FromPort = 22,
-          ToPort = 22,
-          CidrIp = '0.0.0.0/0'
-      )
+      for inbound in kwargs['allow_inbound']:
+          group.authorize_ingress(
+              IpProtocol = inbound['protocol'],
+              FromPort = inbound['from_port'],
+              ToPort = inbound['to_port'],
+              CidrIp = inbound['ip']
+          )
 
       return group

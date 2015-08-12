@@ -63,6 +63,19 @@ if args.op == 'launch':
             size = 100, 
             volume_type = 'gp2', 
             delete_on_termination = True
+        ) \
+        .create_security_group(
+            name = args.cluster_name,
+            allow_ssh = True,
+            allow_all_own_traffic = True
+        ) \
+        .security_group(name = 'spark') \
+        .create_security_group(
+            name = 'spark'
+            allow_inbound = [
+                { protocol: 'tcp', from_port: 8080, to_port: 8080, ip: 'any' },
+                { protocol: 'tcp', from_port: 4040, to_port: 4040, ip: 'any' }
+            ]
         )
  
         launcher.launch(conf)
