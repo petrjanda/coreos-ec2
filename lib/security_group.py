@@ -5,8 +5,6 @@ ec2 = aws.resource('ec2')
 def create_security_group(kwargs):
     """ Create new EC2 security group given the description """
 
-    print(kwargs)
-
     group = ec2.create_security_group(
         GroupName = kwargs['name'],
         Description = kwargs['name'] + ' security'
