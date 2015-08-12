@@ -71,7 +71,7 @@ if args.op == 'launch':
         ) \
         .security_group(name = 'spark') \
         .create_security_group(
-            name = 'spark'
+            name = 'spark',
             allow_inbound = [
                 { protocol: 'tcp', from_port: 8080, to_port: 8080, ip: 'any' },
                 { protocol: 'tcp', from_port: 4040, to_port: 4040, ip: 'any' }

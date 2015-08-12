@@ -1,6 +1,6 @@
 import boto3 as aws
 import logging
-import create_security_group, find_security_group from lib.security_group
+from lib.security_group import create_security_group, find_security_group
 
 from .cluster import Cluster
 
