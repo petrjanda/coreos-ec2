@@ -1,5 +1,8 @@
 import boto3 as aws
+import botocore, sys
+
 import logging
+from lib.security_group import create_security_group, find_security_group, find_security_group_by_name
 
 from .cluster import Cluster
 
@@ -15,12 +18,13 @@ class ClusterLauncher:
       count = conf.instances_count
       instance_type = conf.instance_type
 
-      group = self.create_security_group(cluster_name)
+      groups = [self.create_security_group(g) for g in conf.security_groups]
+      group_ids = [g.id for g in groups]
 
       # key_pair_name = self.create_key_pair(cluster_name).name
 
       instance_props = conf.props
-      instance_props['SecurityGroupIds'] = [group.id]
+      instance_props['SecurityGroupIds'] = group_ids
 
       logging.info("--> Creating instances")
       instances = self.ec2.create_instances(**instance_props)
@@ -61,21 +65,16 @@ class ClusterLauncher:
 
     return key_pair
 
-  def create_security_group(self, cluster_name):
-      group = self.ec2.create_security_group(
-          GroupName = cluster_name,
-          Description = cluster_name + ' security'
-      )
+  def create_security_group(self, kwargs):
+      if(kwargs['action'] == 'find'):
+          return find_security_group(kwargs['name'])
 
-      group.authorize_ingress(
-          SourceSecurityGroupName = cluster_name
-      )
+      elif(kwargs['action'] == 'find-create'):
+          group = find_security_group_by_name(kwargs['name'])
 
-      group.authorize_ingress(
-          IpProtocol = 'tcp',
-          FromPort = 22,
-          ToPort = 22,
-          CidrIp = '0.0.0.0/0'
-      )
+          if(group is None):
+              return create_security_group(kwargs)
 
-      return group
+          return group
+      else:
+          return create_security_group(kwargs)

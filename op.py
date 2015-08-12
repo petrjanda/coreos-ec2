@@ -63,8 +63,20 @@ if args.op == 'launch':
             size = 100, 
             volume_type = 'gp2', 
             delete_on_termination = True
+        ) \
+        .find_or_create_security_group(
+            name = 'spark',
+            allow_inbound = [
+                { 'protocol': 'tcp', 'from_port': 8080, 'to_port': 8080, 'ip': '0.0.0.0/0' },
+                { 'protocol': 'tcp', 'from_port': 4040, 'to_port': 4040, 'ip': '0.0.0.0/0' }
+            ]
+        ) \
+        .create_security_group(
+            name = args.cluster_name,
+            allow_ssh_from = '0.0.0.0/0',
+            allow_all_own_traffic = True
         )
- 
+
         launcher.launch(conf)
 
         instances = Cluster(args.cluster_name).instances

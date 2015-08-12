@@ -14,6 +14,7 @@ coreos_ami = {
 }
 
 image_types = {
+    't2': 'hvm',
     'm1': 'pv',
     'c4': 'hvm'
 }
