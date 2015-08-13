@@ -7,9 +7,8 @@ from scp import SCPClient
  
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
-from lib.cloud_config import CloudConfig
+from lib.coreos_cluster_conf import CoreOSClusterConf
 from lib.cluster_conf import ClusterConf
-from lib.coreos import get_ami
 
 env.check()
 
@@ -42,18 +41,12 @@ region = os.getenv("AWS_DEFAULT_REGION")
 cluster = Cluster(args.cluster_name)
 
 if args.op == 'launch':
-    logging.info("--> Fetching CoreOS etcd discovery token")
-    cloud_config = CloudConfig(
-        open(args.cloud_config_path).read()
-    ).with_new_token(args.instances_count)
-
     try:
-        launcher = ClusterLauncher()
-        ami = get_ami(region, args.instance_type)
-
-        conf = ClusterConf(
-            args.cluster_name, ami, args.key_pair_name,
-            user_data = cloud_config,
+        conf = CoreOSClusterConf(
+            args.cluster_name, 
+            region, 
+            args.cloud_config_path, 
+            args.key_pair_name,
             instances_count = int(args.instances_count),
             instance_type = args.instance_type,
             allocate_ip_address = False
@@ -77,8 +70,7 @@ if args.op == 'launch':
             allow_all_own_traffic = True
         )
 
-        launcher.launch(conf)
-
+        ClusterLauncher().launch(conf)
         instances = Cluster(args.cluster_name).instances
 
         logging.info("--> " + str([i.public_dns_name for i in instances]))
