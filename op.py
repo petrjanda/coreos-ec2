@@ -7,7 +7,7 @@ from scp import SCPClient
  
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
-from lib.coreos_cluster_conf import CoreOSClusterConf
+from lib.coreos import get_cluster_conf
 from lib.cluster_conf import ClusterConf
 
 env.check()
@@ -42,7 +42,7 @@ cluster = Cluster(args.cluster_name)
 
 if args.op == 'launch':
     try:
-        conf = CoreOSClusterConf(
+        conf = get_cluster_conf(
             args.cluster_name, 
             region, 
             args.cloud_config_path, 
