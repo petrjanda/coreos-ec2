@@ -26,6 +26,8 @@ class TestAmi(unittest.TestCase):
             allocate_ip_address = False
         )
 
+        req.assert_called_with('https://discovery.etcd.io/new?size=2')
+
         self.assertEqual(conf.props, {
             'ImageId': 'ami-3d73d356', 
             'UserData': '#cloud-config\n\ncoreos:\n  etcd2:\n    discovery: test\n',
