@@ -28,7 +28,7 @@ class TestAmi(unittest.TestCase):
 
         self.assertEqual(conf.props, {
             'ImageId': 'ami-3d73d356', 
-            'UserData': '#cloud-config\n',
+            'UserData': '#cloud-config\n\ncoreos:\n  etcd2:\n    discovery: test\n',
             'MinCount':1, 
             'MaxCount':2,
             'KeyName':'key_pair',
