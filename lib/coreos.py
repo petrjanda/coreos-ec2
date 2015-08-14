@@ -32,9 +32,11 @@ def get_cluster_conf(cluster_name, region, cloud_config_path, key_pair_name, ins
     ami = get_ami(region, instance_type)
 
     logging.info("--> Fetching CoreOS etcd discovery token")
+    cloud_config_file = open(cloud_config_path)
     cloud_config = CloudConfig(
-        open(cloud_config_path).read()
+        cloud_config_file.read()
     ).with_new_token(instances_count)
+    cloud_config_file.close()
 
     return ClusterConf(
         cluster_name, ami, key_pair_name, 
