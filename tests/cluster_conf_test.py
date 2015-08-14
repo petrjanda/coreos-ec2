@@ -49,3 +49,28 @@ class TestClusterConf(unittest.TestCase):
             }
         ])
 
+    def test_security_groups(self):
+        conf = ClusterConf(*self.args, instances_count = 2) \
+            .security_group(name = 'ssh') \
+            .create_security_group(
+                name = 'spark',
+                allow_inbound = [
+                    dict(protocol = 'tcp', from_port = 8080, to_port = 8080, ip = '0.0.0.0/0')
+                ]
+            )
+
+        self.assertEqual(conf.security_groups, [
+            dict(
+                action = 'find',
+                name = 'ssh'
+            ),
+            dict(
+                action = 'create',
+                name = 'spark',
+                allow_inbound = [
+                    dict(protocol = 'tcp', from_port = 8080, to_port = 8080, ip = '0.0.0.0/0')
+                ]
+            )
+
+        ])
+

@@ -40,30 +40,30 @@ class ClusterConf:
 
     @property
     def block_device_mappings(self):
-        return [{
-            'DeviceName': v['name'],
-            'Ebs': {
-                'VolumeSize': v['size'],
-                'VolumeType': v['volume_type'],
-                'DeleteOnTermination': v['delete_on_termination']
-            }
-        } for v in self._volumes]
+        return [dict(
+            DeviceName = v['name'],
+            Ebs = dict(
+                VolumeSize = v['size'],
+                VolumeType = v['volume_type'],
+                DeleteOnTermination = v['delete_on_termination']
+            )
+        ) for v in self._volumes]
 
     @property
     def props(self):
-        return {
-            'ImageId': self._ami, 
-            'UserData': self._user_data,
-            'MinCount':1, 
-            'MaxCount':self.instances_count,
-            'KeyName':self.key_pair_name,
-            'InstanceType':self.instance_type,
-            'Monitoring':{
-                'Enabled': True
-            },
+        return dict(
+            ImageId = self._ami, 
+            UserData = self._user_data,
+            MinCount = 1, 
+            MaxCount = self.instances_count,
+            KeyName = self.key_pair_name,
+            InstanceType = self.instance_type,
+            Monitoring = dict(
+                Enabled = True
+            ),
 
-            'BlockDeviceMappings':self.block_device_mappings
-        }
+            BlockDeviceMappings = self.block_device_mappings
+        )
 
     #def volume(name = '/dev/sdb', size = 100, volume_type = 'gp2', delete_on_termination = True):
     def volume(self, **kwargs):

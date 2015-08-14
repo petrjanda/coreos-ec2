@@ -60,8 +60,8 @@ if args.op == 'launch':
         .find_or_create_security_group(
             name = 'spark',
             allow_inbound = [
-                { 'protocol': 'tcp', 'from_port': 8080, 'to_port': 8080, 'ip': '0.0.0.0/0' },
-                { 'protocol': 'tcp', 'from_port': 4040, 'to_port': 4040, 'ip': '0.0.0.0/0' }
+                dict(protocol = 'tcp', from_port = 8080, to_port = 8080, ip = '0.0.0.0/0'),
+                dict(protocol = 'tcp', from_port = 4040, to_port = 4040, ip = '0.0.0.0/0')
             ]
         ) \
         .create_security_group(
