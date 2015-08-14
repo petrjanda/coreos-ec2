@@ -48,14 +48,6 @@ class Cluster:
         aws.client('ec2').delete_security_group(
             GroupName = self.name
         )
-
-    def find_instances(self):
-        return self.ec2.instances.filter(
-            Filters=[
-                {'Name': 'tag-key', 'Values': ['Cluster']},
-                {'Name': 'tag-value', 'Values': [self.name]},
-            ]
-        )
       
     def exists(self):
         return len(list(self.instances)) > 0
