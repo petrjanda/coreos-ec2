@@ -48,11 +48,11 @@ def get_cluster_conf(cluster_name, region, cloud_config_path, key_pair_name, ins
         allocate_ip_address = allocate_ip_address
     )
 
-def read_conf(path):
+def read_conf(cluster_name, path):
     c = yaml.load(open(path))
 
     conf = get_cluster_conf(
-        c['cluster_name'], 
+        cluster_name, 
         c['region'], 
         c['cloud_config'], 
         c['key_pair'],

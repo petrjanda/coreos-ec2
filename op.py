@@ -39,7 +39,7 @@ cluster = Cluster(args.cluster_name)
 
 if args.op == 'launch':
     try:
-        conf = read_conf(args.cluster_conf_path)
+        conf = read_conf(args.cluster_name, args.cluster_conf_path)
         ClusterLauncher().launch(conf)
     except botocore.exceptions.WaiterError:
         logging.error("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 

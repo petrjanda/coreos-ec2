@@ -1,4 +1,3 @@
-cluster_name: s-1
 region: us-east-1
 cloud_config: config/cloud-config.example
 key_pair: my-key-us-east
