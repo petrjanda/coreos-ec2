@@ -1,0 +1,35 @@
+cluster_name: s-1
+region: us-east-1
+cloud_config: config/cloud-config.example
+key_pair: my-key-us-east
+instances_count: 2
+instance_type: c4.large
+allocate_ip_address: yes
+
+volumes:
+  - 
+    name: /dev/sdb
+    size: 100
+    volume_type: gp2
+    delete_on_termination: yes
+
+security_groups:
+  - 
+    name: spark
+    action: find_or_create
+    allow_inbound:
+      - 
+        protocol: tcp
+        from_port: 8080
+        to_port: 8080
+        ip: 0.0.0.0/0
+      - 
+        protocol: tcp
+        from_port: 4040
+        to_port: 4040
+        ip: 0.0.0.0/0
+  - 
+    name: s-1
+    action: create
+    allow_all_own_traffic: true
+    allow_ssh_from: 0.0.0.0/0

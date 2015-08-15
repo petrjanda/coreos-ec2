@@ -69,7 +69,7 @@ class ClusterLauncher:
       if(kwargs['action'] == 'find'):
           return find_security_group(kwargs['name'])
 
-      elif(kwargs['action'] == 'find-create'):
+      elif(kwargs['action'] == 'find_or_create'):
           group = find_security_group_by_name(kwargs['name'])
 
           if(group is None):

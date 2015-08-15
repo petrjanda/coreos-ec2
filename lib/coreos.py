@@ -1,4 +1,6 @@
 import os, sys, argparse, botocore, utils, logging
+import yaml
+
 from lib.cluster_conf import ClusterConf
 from lib.cloud_config import CloudConfig
 
@@ -45,3 +47,28 @@ def get_cluster_conf(cluster_name, region, cloud_config_path, key_pair_name, ins
         instances_count = instances_count, 
         allocate_ip_address = allocate_ip_address
     )
+
+def read_conf(path):
+    c = yaml.load(open(path))
+
+    conf = get_cluster_conf(
+        c['cluster_name'], 
+        c['region'], 
+        c['cloud_config'], 
+        c['key_pair'],
+        instances_count = int(c['instances_count']),
+        instance_type = c['instance_type'],
+        allocate_ip_address = c['allocate_ip_address'] == 'yes' 
+    )
+
+    for v in c['volumes']:
+        v['delete_on_termination'] = v['delete_on_termination'] == 'yes'
+
+        conf = conf.volume(**v)
+
+    for s in c['security_groups']:
+        conf = conf.security_group(**s)
+
+    return conf
+
+

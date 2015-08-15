@@ -7,7 +7,7 @@ from scp import SCPClient
  
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
-from lib.coreos import get_cluster_conf
+from lib.coreos import get_cluster_conf, read_conf
 from lib.cluster_conf import ClusterConf
 
 env.check()
@@ -22,10 +22,7 @@ parser_scp.add_argument('from_path')
 parser_scp.add_argument('to_path')
 
 parser_launch = subparsers.add_parser('launch')
-parser_launch.add_argument("instance_type")
-parser_launch.add_argument("instances_count")
-parser_launch.add_argument("key_pair_name")
-parser_launch.add_argument("cloud_config_path")
+parser_launch.add_argument("cluster_conf_path")
 
 parser_start = subparsers.add_parser('start')
 parser_stop = subparsers.add_parser('stop')
@@ -42,38 +39,8 @@ cluster = Cluster(args.cluster_name)
 
 if args.op == 'launch':
     try:
-        conf = get_cluster_conf(
-            args.cluster_name, 
-            region, 
-            args.cloud_config_path, 
-            args.key_pair_name,
-            instances_count = int(args.instances_count),
-            instance_type = args.instance_type,
-            allocate_ip_address = False
-        ) \
-        .volume(
-            name = '/dev/sdb', 
-            size = 100, 
-            volume_type = 'gp2', 
-            delete_on_termination = True
-        ) \
-        .find_or_create_security_group(
-            name = 'spark',
-            allow_inbound = [
-                dict(protocol = 'tcp', from_port = 8080, to_port = 8080, ip = '0.0.0.0/0'),
-                dict(protocol = 'tcp', from_port = 4040, to_port = 4040, ip = '0.0.0.0/0')
-            ]
-        ) \
-        .create_security_group(
-            name = args.cluster_name,
-            allow_ssh_from = '0.0.0.0/0',
-            allow_all_own_traffic = True
-        )
-
+        conf = read_conf(args.cluster_conf_path)
         ClusterLauncher().launch(conf)
-        instances = Cluster(args.cluster_name).instances
-
-        logging.info("--> " + str([i.public_dns_name for i in instances]))
     except botocore.exceptions.WaiterError:
         logging.error("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 
         cluster.terminate()
