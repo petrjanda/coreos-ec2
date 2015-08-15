@@ -115,10 +115,46 @@ As you can see `/dev/xvdb` is mounted at `/media/ebs` correctly. See more at htt
 
 ## Start a cluster
 
-Cluster of `N` nodes will be started with EBS volume attached and mounted. All nodes will be connected to
-single cluster with unique discovery token and EC2 security group.
+Given our conf:
 
-Replace `xxx` by appropriate key-pair name:
+    region: us-east-1
+    cloud_config: config/cloud-config.example
+    key_pair: YOUR-KEY-PAIR 
+    instances_count: 2
+    instance_type: c4.large
+    allocate_ip_address: yes
+
+    volumes:
+      - 
+        name: /dev/sdb
+        size: 100
+        volume_type: gp2
+        delete_on_termination: yes
+
+    security_groups:
+      - 
+        name: spark
+        action: find_or_create
+        allow_inbound:
+          - 
+            protocol: tcp
+            from_port: 8080
+            to_port: 8080
+            ip: 0.0.0.0/0
+          - 
+            protocol: tcp
+            from_port: 4040
+            to_port: 4040
+            ip: 0.0.0.0/0
+      - 
+        name: p-1
+        action: create
+        allow_all_own_traffic: true
+        allow_ssh_from: 0.0.0.0/0
+
+Cluster of `N` nodes will be started with EBS volume attached and mounted. All nodes will be connected to single cluster with unique discovery token.
+Additionally there will be new security group `p-1` created which will allow all traffic within the cluster and ports 8080, 4040 from outside the cluster from any IP (be sure you're ok to publish
+ports like that). 
 
     ➜  coreos-ec2 git:(master) ✗ python3 op.py p-1 launch config/cluster-conf.yml.example
     INFO: --> Fetching CoreOS etcd discovery token
