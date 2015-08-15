@@ -120,12 +120,24 @@ single cluster with unique discovery token and EC2 security group.
 
 Replace `xxx` by appropriate key-pair name:
 
-    (venv)➜  python-ec2 git:(master) ✗ python3 launch.py p-1 c4.large 2 <xxx> ./config/cloud-config.example
+    ➜  coreos-ec2 git:(master) ✗ python3 op.py p-1 launch config/cluster-conf.yml.example
     INFO: --> Fetching CoreOS etcd discovery token
-    INFO: --> Creating 2 instances of ami-3d73d356
+    INFO: Starting new HTTPS connection (1): discovery.etcd.io
+    INFO: Starting new HTTPS connection (1): ec2.us-east-1.amazonaws.com
+    INFO: Calling ec2:create_security_group with {'Description': 'p-1 security', 'GroupName': 'p-1'}
+    INFO: Starting new HTTPS connection (1): ec2.us-east-1.amazonaws.com
+    INFO: Calling ec2:authorize_security_group_ingress with {'GroupId': 'sg-d42cb2b3', 'SourceSecurityGroupName': 'p-1'}
+    INFO: Calling ec2:authorize_security_group_ingress with {'FromPort': 22, 'IpProtocol': 'tcp', 'GroupId': 'sg-d42cb2b3', 'ToPort': 22, 'CidrIp': '0.0.0.0/0'}
+    INFO: --> Creating instances
+    INFO: Calling ec2:run_instances with {'MinCount': 1, 'UserData': '#cloud-config\n\ncoreos:\n  etcd:\n    discovery: https://discovery.etcd.io/86952ca2bf0d49d7ecaff9a5783070d4\n    addr: $private_ipv4:4001\n    peer-addr: $private_ipv4:7001\n  etcd2:\n    discovery: https://discovery.etcd.io/86952ca2bf0d49d7ecaff9a5783070d4\n    advertise-client-urls: http://$private_ipv4:2379,http://$private_ipv4:4001\n    initial-advertise-peer-urls: http://$private_ipv4:2380\n    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001\n    listen-peer-urls: http://$private_ipv4:2380,http://$private_ipv4:7001\n  units:\n    - name: etcd.service\n      command: start\n\n    - name: fleet.service\n      command: start\n\n    - name: format-xvdb.service\n      command: start\n      content: |\n        [Unit]\n        Description=Formats the EBS drive\n        After=dev-xvdb.device\n        Requires=dev-xvdb.device\n\n        [Service]\n        Type=oneshot\n        RemainAfterExit=yes\n        ExecStart=/usr/sbin/wipefs -f /dev/xvdb\n        ExecStart=/usr/sbin/mkfs.ext4 /dev/xvdb\n\n    - name: media-ebs.mount\n      command: start\n      content: |\n        [Unit]\n        After=format-xvdb.service\n\n        [Mount]\n        What=/dev/xvdb\n        Where=/media/ebs\n        Type=ext4\n\n    - name: flanneld.service\n      command: start\n      drop-ins:\n        - name: 50-network-config.conf\n          content: |\n            [Service]\n            ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config \'{ "Network": "10.1.0.0/16" }\'\n', 'Monitoring': {'Enabled': True}, 'InstanceType': 'c4.large', 'BlockDeviceMappings': [{'Ebs': {'VolumeSize': 100, 'DeleteOnTermination': False, 'VolumeType': 'gp2'}, 'DeviceName': '/dev/sdb'}], 'ImageId': 'ami-3d73d356', 'KeyName': 'gwi-us-east', 'SecurityGroupIds': ['sg-b350c0d4', 'sg-d42cb2b3'], 'MaxCount': 2}
+    INFO: Starting new HTTPS connection (1): ec2.us-east-1.amazonaws.com
     INFO: --> Tagging instances with cluster name 'p-1'
+    INFO: Calling ec2:create_tags with {'Resources': ['i-962e9e3d'], 'Tags': [{'Key': 'Name', 'Value': 'p-1-1'}, {'Key': 'Cluster', 'Value': 'p-1'}]}
+    INFO: Calling ec2:create_tags with {'Resources': ['i-232e9e88'], 'Tags': [{'Key': 'Name', 'Value': 'p-1-2'}, {'Key': 'Cluster', 'Value': 'p-1'}]}
     INFO: --> Waiting for instances to be in 'running' state
-    INFO: --> ['ec2-54-86-26-171.compute-1.amazonaws.com', 'ec2-52-4-163-190.compute-1.amazonaws.com']
+    INFO: Calling ec2:wait_until_running with {'InstanceIds': ['i-962e9e3d']}
+    INFO: Calling ec2:wait_until_running with {'InstanceIds': ['i-232e9e88']}
+    ➜  coreos-ec2 git:(master) ✗
 
     # Get DNS
     (venv)➜  python-ec2 git:(master) ✗ python3 op.py p-1 dns
