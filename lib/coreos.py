@@ -58,12 +58,10 @@ def read_conf(cluster_name, path):
         c['key_pair'],
         instances_count = int(c['instances_count']),
         instance_type = c['instance_type'],
-        allocate_ip_address = c['allocate_ip_address'] == 'yes' 
+        allocate_ip_address = c['allocate_ip_address']
     )
 
     for v in c['volumes']:
-        v['delete_on_termination'] = v['delete_on_termination'] == 'yes'
-
         conf = conf.volume(**v)
 
     for s in c['security_groups']:

@@ -1,6 +1,7 @@
 import os, sys, argparse, botocore, utils, logging
 import lib.env as env
 import paramiko, base64
+import boto3 as aws
 
 from paramiko import SSHClient
 from scp import SCPClient
@@ -22,7 +23,6 @@ parser_scp.add_argument('from_path')
 parser_scp.add_argument('to_path')
 
 parser_launch = subparsers.add_parser('launch')
-parser_launch.add_argument("cluster_conf_path")
 
 parser_start = subparsers.add_parser('start')
 parser_stop = subparsers.add_parser('stop')
@@ -30,6 +30,8 @@ parser_cleanup = subparsers.add_parser('cleanup')
 parser_status = subparsers.add_parser('status')
 parser_dns = subparsers.add_parser('dns')
 parser_ip = subparsers.add_parser('ip')
+subparsers.add_parser('test')
+subparsers.add_parser('terminate')
 
 args = parser.parse_args()
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -39,7 +41,7 @@ cluster = Cluster(args.cluster_name)
 
 if args.op == 'launch':
     try:
-        conf = read_conf(args.cluster_name, args.cluster_conf_path)
+        conf = read_conf(args.cluster_name, os.getenv("CONFIG_PATH") + args.cluster_name + ".conf")
         ClusterLauncher().launch(conf)
     except botocore.exceptions.WaiterError:
         logging.error("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 
@@ -48,6 +50,15 @@ if args.op == 'launch':
 
 elif args.op == "status":
     print(cluster.status)
+
+elif args.op == "test":
+    groups = list(cluster.instances)[0].security_groups
+
+    for g in groups:
+        try:
+            aws.resource('ec2').SecurityGroup(g['GroupId']).delete()
+        except botocore.exceptions.ClientError as e:
+            print(g['GroupName'])
 
 elif args.op == "dns":
     print([i.public_dns_name for i in cluster.instances])
@@ -73,7 +84,10 @@ elif args.op == 'scp':
     scp.put(args.from_path, args.to_path)
     scp.close()
 
+elif args.op == "terminate":
+    utils.confirm("You are about to terminate the whole cluster.")
+    cluster.terminate()
+
 elif args.op == "cleanup":
     utils.confirm("You are about to terminate and remove the whole cluster.")
-    cluster.terminate()
     cluster.cleanup()

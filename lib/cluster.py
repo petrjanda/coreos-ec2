@@ -1,4 +1,7 @@
 import boto3 as aws
+import itertools
+import botocore
+import logging
 
 class Cluster:
     """ CoreOS cluster """
@@ -26,28 +29,36 @@ class Cluster:
         return list(statuses)[0]
 
     def terminate(self):
-        print('--> Terminate instances')
+        logging.info('--> Terminate instances')
         self.instances.terminate()
         for instance in self.instances:
             instance.wait_until_terminated()
 
     def stop(self):
-        print('--> Stop instances')
+        logging.info('--> Stop instances')
         self.instances.stop()
         for instance in self.instances:
             instance.wait_until_stopped()
 
     def start(self):
-        print('--> Start instances')
+        logging.info('--> Start instances')
         self.instances.start()
         for instance in self.instances:
             instance.wait_until_running()
 
     def cleanup(self):
-        print("--> Delete security group '%s'" % self.name)
-        aws.client('ec2').delete_security_group(
-            GroupName = self.name
-        )
+        logging.info("--> Delete security groups")
+        groups = set([g['GroupId'] for g in itertools.chain(*map(lambda i: i.security_groups, self.instances))])
+        
+        self.terminate()
+
+        for g in groups:
+            try:
+                self.ec2.SecurityGroup(g).delete()
+
+                logging.info("--> " + g + " deleted")
+            except botocore.exceptions.ClientError as e:
+                logging.info("--> " + g + " couldn't be deleted")
       
     def exists(self):
         return len(list(self.instances)) > 0
