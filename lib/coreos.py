@@ -49,7 +49,10 @@ def get_cluster_conf(cluster_name, region, cloud_config_path, key_pair_name, ins
     )
 
 def read_conf(cluster_name, path):
-    c = yaml.load(open(path))
+    f = open(path)
+    c = f.read().replace('$cluster_name', cluster_name)
+    c = yaml.load(c)
+    f.close()
 
     conf = get_cluster_conf(
         cluster_name, 

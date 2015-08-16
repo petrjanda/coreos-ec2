@@ -23,6 +23,7 @@ parser_scp.add_argument('from_path')
 parser_scp.add_argument('to_path')
 
 parser_launch = subparsers.add_parser('launch')
+parser_launch.add_argument('cluster_conf_path')
 
 parser_start = subparsers.add_parser('start')
 parser_stop = subparsers.add_parser('stop')
@@ -41,7 +42,7 @@ cluster = Cluster(args.cluster_name)
 
 if args.op == 'launch':
     try:
-        conf = read_conf(args.cluster_name, os.getenv("CONFIG_PATH") + args.cluster_name + ".conf")
+        conf = read_conf(args.cluster_name, args.cluster_conf_path)
         ClusterLauncher().launch(conf)
     except botocore.exceptions.WaiterError:
         logging.error("--x Failed to launch instances, Please check your AWS console, some machines may be already running!") 

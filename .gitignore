@@ -2,3 +2,4 @@ __pycache__/
 .aws
 cloud-config
 venv/
+.conf/

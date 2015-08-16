@@ -13,7 +13,3 @@ def check():
   if os.getenv('AWS_DEFAULT_REGION') is None:
     print("ERROR: The environment variable AWS_DEFAULT_REGION must be set", file=sys.stderr)
     sys.exit(1)
-
-  if os.getenv('CONFIG_PATH') is None:
-    print("ERROR: The environment variable CONFIG_PATH must be set", file=sys.stderr)
-    sys.exit(1)

@@ -1,6 +1,6 @@
 region: us-east-1
 cloud_config: config/cloud-config.example
-key_pair: my-key-us-east
+key_pair: YOUR-KEY
 instances_count: 2
 instance_type: c4.large
 allocate_ip_address: yes
@@ -28,7 +28,7 @@ security_groups:
         to_port: 4040
         ip: 0.0.0.0/0
   - 
-    name: s-1
+    name: $cluster_name
     action: create
     allow_all_own_traffic: true
     allow_ssh_from: 0.0.0.0/0
