@@ -35,9 +35,6 @@ coreos:
     - name: media-ebs.mount
       command: start
       content: |
-        [Unit]
-        After=format-xvdb.service
-
         [Mount]
         What=/dev/xvdb
         Where=/media/ebs
