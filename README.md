@@ -75,23 +75,20 @@ units:
     - name: format-xvdb.service
       command: start
       content: |
-        [Unit]
-        Description=Formats the EBS drive
-        After=dev-xvdb.device
-        Requires=dev-xvdb.device
-
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/sbin/wipefs -f /dev/xvdb
-        ExecStart=/usr/sbin/mkfs.ext4 /dev/xvdb
+        ExecStart=/bin/sh -c ' \
+        if [[ -n $(/usr/sbin/blkid /dev/xvdb) ]]; then \
+          echo "exists"; \
+        else \
+          /usr/sbin/wipefs -f /dev/xvdb; \
+          /usr/sbin/mkfs.ext4 /dev/xvdb; \
+        fi'
 
     - name: media-ebs.mount
       command: start
       content: |
-        [Unit]
-        After=format-xvdb.service
-
         [Mount]
         What=/dev/xvdb
         Where=/media/ebs
