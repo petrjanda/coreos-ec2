@@ -31,10 +31,10 @@ coreos:
         RemainAfterExit=yes
         ExecStart=/bin/sh -c ' \
         if [[ -n $(/usr/sbin/blkid /dev/xvdb) ]]; then \
-          echo "exists" \
+          echo "exists"; \
         else \
-          /usr/sbin/wipefs -f /dev/xvdb \
-          /usr/sbin/mkfs.ext4 /dev/xvdb \
+          /usr/sbin/wipefs -f /dev/xvdb; \
+          /usr/sbin/mkfs.ext4 /dev/xvdb; \
         fi'
 
     - name: media-ebs.mount
