@@ -1,80 +1,86 @@
+""" Module to execute EC2 cluster launch """
+
 import boto3 as aws
-import botocore, sys
 
 import logging
-from lib.security_group import create_security_group, find_security_group, find_security_group_by_name
+from lib.security_group \
+    import create_security_group, find_security_group, find_security_group_by_name
 
 from .cluster import Cluster
 
 class ClusterLauncher:
-  """ Cluster formation """
+    """ Cluster formation """
 
-  def __init__(self):
-      self.ec2 = aws.resource('ec2')
-      self.client = aws.client('ec2')
+    def __init__(self):
+        self.ec2 = aws.resource('ec2')
+        self.client = aws.client('ec2')
 
-  def launch(self, conf):
-      cluster_name = conf.cluster_name
-      count = conf.instances_count
-      instance_type = conf.instance_type
+    def launch(self, conf):
+        """ Launch new cluster according to provided conf """
 
-      groups = [self.create_security_group(g) for g in conf.security_groups]
-      group_ids = [g.id for g in groups]
+        cluster_name = conf.cluster_name
 
-      # key_pair_name = self.create_key_pair(cluster_name).name
+        groups = [add_security_group(g) for g in conf.security_groups]
+        group_ids = [g.id for g in groups]
 
-      instance_props = conf.props
-      instance_props['SecurityGroupIds'] = group_ids
+        # key_pair_name = self.create_key_pair(cluster_name).name
 
-      logging.info("--> Creating instances")
-      instances = self.ec2.create_instances(**instance_props)
+        instance_props = conf.props
+        instance_props['SecurityGroupIds'] = group_ids
 
-      logging.info("--> Tagging instances with cluster name '%s'" % cluster_name)
-      for i, instance in enumerate(instances):
-          instance.create_tags(
-              Tags=[
-                  {'Key': 'Name', 'Value': cluster_name + '-' + str(i + 1)},
-                  {'Key': 'Cluster', 'Value': cluster_name}
-              ]
-          )
+        logging.info("--> Creating instances")
+        instances = self.ec2.create_instances(**instance_props)
 
-      logging.info("--> Waiting for instances to be in 'running' state")
-      for i, instance in enumerate(instances):
-          instance.wait_until_running()
+        logging.info("--> Tagging instances with cluster name '%s'" % cluster_name)
+        for i, instance in enumerate(instances):
+            instance.create_tags(
+                Tags=[
+                    {'Key': 'Name', 'Value': cluster_name + '-' + str(i + 1)},
+                    {'Key': 'Cluster', 'Value': cluster_name}
+                ]
+            )
 
-      if(conf.allocate_ip_address is True):
-          logging.info("--> Creating IP addresses")
-          for instance in instances:
-              ip_address = self.client.allocate_address(
-                  Domain = 'standard'
-              )
+        logging.info("--> Waiting for instances to be in 'running' state")
+        for i, instance in enumerate(instances):
+            instance.wait_until_running()
 
-              self.client.associate_address(
-                  InstanceId = instance.id,
-                  PublicIp = ip_address['PublicIp']
-              )
+        if conf.allocate_ip_address is True:
+            logging.info("--> Creating IP addresses")
+            for instance in instances:
+                ip_address = self.client.allocate_address(
+                    Domain='standard'
+                )
 
-      return Cluster(cluster_name)
+                self.client.associate_address(
+                    InstanceId=instance.id,
+                    PublicIp=ip_address['PublicIp']
+                )
 
-  def create_key_pair(self, cluster_name):
-    key_pair = self.ec2.create_key_pair(
-        KeyName = cluster_name
-    )
+        return Cluster(cluster_name)
 
-    key_pair.save('./' + cluster_name + '.pem')
+    def create_key_pair(self, cluster_name):
+        """ Create new keypair """
 
-    return key_pair
+        key_pair = self.ec2.create_key_pair(
+            KeyName=cluster_name
+        )
 
-  def create_security_group(self, kwargs):
-      if(kwargs['action'] == 'find'):
-          return find_security_group(kwargs['name'])
+        key_pair.save('./' + cluster_name + '.pem')
 
-      elif(kwargs['action'] == 'find_or_create'):
-          group = find_security_group_by_name(kwargs['name'])
+        return key_pair
 
-          if(group is None):
-              return create_security_group(kwargs)
+def add_security_group(kwargs):
+    """ Find or create a security group """
 
-          return group
-      else:
-          return create_security_group(kwargs)
+    if kwargs['action'] == 'find':
+        return find_security_group(kwargs['name'])
+
+    elif kwargs['action'] == 'find_or_create':
+        group = find_security_group_by_name(kwargs['name'])
+
+        if group is None:
+            return create_security_group(kwargs)
+
+        return group
+    else:
+        return create_security_group(kwargs)
