@@ -51,8 +51,12 @@ class TestClusterConf(unittest.TestCase):
 
     def test_security_groups(self):
         conf = ClusterConf(*self.args, instances_count = 2) \
-            .security_group(name = 'ssh') \
-            .create_security_group(
+            .security_group(
+                action = 'find',
+                name = 'ssh'
+            ) \
+            .security_group(
+                action = 'create',
                 name = 'spark',
                 allow_inbound = [
                     dict(protocol = 'tcp', from_port = 8080, to_port = 8080, ip = '0.0.0.0/0')

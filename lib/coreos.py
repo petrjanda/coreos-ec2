@@ -2,7 +2,7 @@ import os, sys, argparse, botocore, utils, logging
 import yaml
 
 from lib.cluster_conf import ClusterConf
-from lib.cloud_config import CloudConfig
+import lib.cloud_config
 
 coreos_ami = { 
     "eu-west-1": { 
@@ -35,9 +35,10 @@ def get_cluster_conf(cluster_name, region, cloud_config_path, key_pair_name, ins
 
     logging.info("--> Fetching CoreOS etcd discovery token")
     cloud_config_file = open(cloud_config_path)
-    cloud_config = CloudConfig(
-        cloud_config_file.read()
-    ).with_new_token(instances_count)
+
+    cloud_config = lib.cloud_config.with_new_token(
+        cloud_config_file.read(), instances_count
+    )
     cloud_config_file.close()
 
     return ClusterConf(
