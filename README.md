@@ -115,6 +115,17 @@ As you can see `/dev/xvdb` is mounted at `/media/ebs` correctly. See more at htt
 
 ## Start a cluster
 
+To start a cluster you will need a `conf` file which describes the cluster you would like to create. Here is the list of attributes you can specify:
+
+  * `region` (required) - ID of one of the AWS regions (eu-east-1)
+  * `cloud_config` (required) - path to the cloud config file which will be used to initialise CoreOS nodes
+  * `key_pair` (required) - name of the EC2 key pair which you'll use to access your instances
+  * `instances_count` (required) - number of instances to launch
+  * `instance_type` (required) - type of the instance to be launched
+  * `allocate_ip_address` (required) - yes/no value specifying if you want a static IP address allocated for each node
+  * `volumes` (optional) - list of volumes you want attached to each node. Each needs to have a `name` (device name), `size` (in gigabytes), `volume_type` (gp2, standard, ...), and `delete_on_termination` (yes/no to specify if the volume should be destroyed when instance is terminated)
+  * `security_groups` (optional) - TBA
+
 Given our conf:
 
     region: us-east-1
@@ -152,8 +163,8 @@ Given our conf:
         allow_all_own_traffic: true
         allow_ssh_from: 0.0.0.0/0
 
-Cluster of `N` nodes will be started with EBS volume attached and mounted. All nodes will be connected to single cluster with unique discovery token.
-Additionally there will be new security group `p-1` created which will allow all traffic within the cluster and ports 8080, 4040 from outside the cluster from any IP (be sure you're ok to publish
+Cluster of 2 nodes will be started with EBS volume attached and mounted. All nodes will be connected to single cluster with unique discovery token.
+Additionally there will be new security group `p-1` created which will allow all traffic within the cluster and ports 8080, 4040 as well as `spark` security group which allows traffic from outside the cluster from any IP (be sure you're ok to publish
 ports like that). 
 
     ➜  coreos-ec2 git:(master) ✗ python3 op.py p-1 launch config/cluster-conf.yml.example
