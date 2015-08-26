@@ -37,7 +37,12 @@ class TestClusterConf(unittest.TestCase):
         })
 
     def test_volume(self):
-        conf = ClusterConf(*self.args, instances_count = 2).volume(name = '/dev/sdb', size = 100, volume_type = 'gp2', delete_on_termination = True)
+        conf = ClusterConf(*self.args, instances_count = 2) \
+        .volume(
+            DeviceName='/dev/sdb', 
+            Ebs=dict(VolumeSize=100,VolumeType='gp2', DeleteOnTermination = True)
+        )
+
         self.assertEqual(conf.block_device_mappings, [
             {
                 'DeviceName': '/dev/sdb',
@@ -48,6 +53,21 @@ class TestClusterConf(unittest.TestCase):
                 }
             }
         ])
+
+    def test_empheral_volume(self):
+        conf = ClusterConf(*self.args, instances_count = 2) \
+        .volume(
+            DeviceName='/dev/sdb', 
+            VirtualName='empheral0'
+        )
+
+        self.assertEqual(conf.block_device_mappings, [
+            {
+                'DeviceName': '/dev/sdb',
+                'VirtualName': 'empheral0'
+            }
+        ])
+
 
     def test_security_groups(self):
         conf = ClusterConf(*self.args, instances_count = 2) \

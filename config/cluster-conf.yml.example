@@ -1,16 +1,21 @@
 region: us-east-1
 cloud_config: config/cloud-config.example
 key_pair: YOUR-KEY
-instances_count: 2
+instances_count: 1
 instance_type: c4.large
-allocate_ip_address: yes
+allocate_ip_address: no
 
 volumes:
   - 
-    name: /dev/sdb
-    size: 100
-    volume_type: gp2
-    delete_on_termination: yes
+    name: /dev/xvdb
+    ebs:
+        volume_size: 100
+        volume_type: gp2
+        delete_on_termination: yes
+
+  - 
+    name: /dev/xvde
+    virtual_name: ephemeral0
 
 security_groups:
   - 
