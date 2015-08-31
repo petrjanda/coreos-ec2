@@ -66,11 +66,22 @@ def read_conf(cluster_name, path):
     )
 
     for v in c['volumes']:
-        conf = conf.volume(**v)
+        conf = conf.volume(**camelize_dict(v))
 
     for s in c['security_groups']:
         conf = conf.security_group(**s)
 
     return conf
 
+def camelize_dict(d):
+    """ Map dictionary keys to camel case (deeply for nested dicts) """
 
+    if not isinstance(d, dict):
+        return d
+
+    return dict([(to_camel_case(v[0]), camelize_dict(v[1])) for v in d.items()])
+
+def to_camel_case(snake_str):
+    """ Transform snake case string to camel case """
+
+    return "".join(x.title() for x in snake_str.split('_'))

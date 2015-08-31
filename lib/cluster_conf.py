@@ -64,14 +64,7 @@ class ClusterConf:
     def block_device_mappings(self):
         """ Block device mapping for EC2 instance creation """
 
-        return [dict(
-            DeviceName=v['name'],
-            Ebs=dict(
-                VolumeSize=v['size'],
-                VolumeType=v['volume_type'],
-                DeleteOnTermination=v['delete_on_termination']
-            )
-        ) for v in self._volumes]
+        return self._volumes
 
     @property
     def props(self):
@@ -91,11 +84,9 @@ class ClusterConf:
             BlockDeviceMappings=self.block_device_mappings
         )
 
-    #def volume(name = '/dev/sdb', size = 100, volume_type = 'gp2', delete_on_termination = True):
     def volume(self, **kwargs):
         """ Add volume """
 
-        # name, size, volume_type required
         self._volumes.append(kwargs)
 
         return self
