@@ -3,3 +3,6 @@ __pycache__/
 cloud-config
 venv/
 .conf/
+build/
+coreec2.egg-info/
+dist/

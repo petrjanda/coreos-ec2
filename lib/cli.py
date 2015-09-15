@@ -1,4 +1,5 @@
-import os, sys, argparse, botocore, utils, logging
+import os, sys, argparse, botocore, logging
+import lib.utils as utils
 import lib.env as env
 import paramiko, base64
 import boto3 as aws
