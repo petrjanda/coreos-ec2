@@ -13,7 +13,7 @@ requires = [
 
 setup_options = dict(
     name='coreec2',
-    version='0.1.0',
+    version='0.1.1',
     description='Command line interface for CoreOS EC2 cluster formation',
     long_description=open('README.md').read(),
     author='Petr Janda',
