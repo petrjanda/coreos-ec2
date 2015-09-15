@@ -1,4 +1,5 @@
-import os, sys, argparse, botocore, utils, logging
+import os, sys, argparse, botocore, logging
+import lib.utils as utils
 import yaml
 
 from lib.cluster_conf import ClusterConf
