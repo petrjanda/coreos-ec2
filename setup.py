@@ -13,9 +13,9 @@ requires = [
 
 setup_options = dict(
     name='coreec2',
-    version='0.1.1',
+    version='0.1.2',
     description='Command line interface for CoreOS EC2 cluster formation',
-    long_description=open('README.md').read(),
+    long_description='Command line interface for CoreOS EC2 cluster formation',
     author='Petr Janda',
     url='http://github.com/petrjanda/coreos-ec2/',
     scripts=['bin/coreec2'],
