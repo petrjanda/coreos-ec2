@@ -3,6 +3,9 @@ __pycache__/
 cloud-config
 venv/
 .conf/
+<<<<<<< HEAD
 build/
 coreec2.egg-info/
 dist/
+.idea
+*.iml

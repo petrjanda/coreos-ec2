@@ -17,6 +17,11 @@ coreos_ami = {
     "us-east-1": { 
         'pv': 'ami-3b73d350',
         'hvm': 'ami-3d73d356'
+    },
+
+    "us-west-2": {
+        'pv': 'ami-87ada4b7',
+        'hvm': 'ami-85ada4b5'
     }
 }
 
