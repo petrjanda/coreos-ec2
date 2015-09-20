@@ -6,12 +6,17 @@ class ClusterConf:
 
     #TODO reduce attributes
     def __init__(self, cluster_name, ami, key_pair_name,
-                 user_data='', instance_type='m1.small',
-                 instances_count=1, allocate_ip_address=False):
+                 coreos_channel='stable',
+                 user_data='',
+                 instance_type='m1.small',
+                 instances_count=1,
+                 allocate_ip_address=False):
         self._cluster_name = cluster_name
         self._ami = ami
+        self._coreos_channel = coreos_channel
         self._user_data = user_data
         self._key_pair_name = key_pair_name
+        self._instance_type = coreos_channel
         self._instance_type = instance_type
         self._instances_count = instances_count
         self._allocate_ip_address = allocate_ip_address
@@ -23,6 +28,12 @@ class ClusterConf:
         """ Ami """
 
         return self._ami
+
+    @property
+    def coreos_channel(self):
+        """ CoreOS Channel """
+
+        return self._coreos_channel
 
     @property
     def security_groups(self):

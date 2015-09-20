@@ -11,6 +11,7 @@ class TestClusterConf(unittest.TestCase):
         self.assertEqual(conf.cluster_name, 's-1')
         self.assertEqual(conf.ami, 'ami')
         self.assertEqual(conf.key_pair_name, 'key_pair')
+        self.assertEqual(conf.coreos_channel, 'stable')
 
     def test_default_instances_count(self):
         conf = ClusterConf(*self.args)

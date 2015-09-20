@@ -1,29 +1,13 @@
-import os, sys, argparse, botocore, logging
+import os, sys, argparse, botocore, logging, json
 import lib.utils as utils
 import yaml
 
 from lib.cluster_conf import ClusterConf
 import lib.cloud_config
 
-coreos_ami = { 
-    "eu-west-1": { 
-        "pv": "ami-0c10417b" 
-    },
-
-    "eu-central-1": { 
-        "pv": "ami-b8cecaa5" 
-    },
-
-    "us-east-1": { 
-        'pv': 'ami-3b73d350',
-        'hvm': 'ami-3d73d356'
-    },
-
-    "us-west-2": {
-        'pv': 'ami-87ada4b7',
-        'hvm': 'ami-85ada4b5'
-    }
-}
+channels = ["alpha", "beta", "stable"]
+ami_list_file_name = "coreos_production_ami_all.json"
+version_file_name = "version.txt"
 
 image_types = {
     't2': 'hvm',
@@ -31,13 +15,17 @@ image_types = {
     'c4': 'hvm'
 }
 
-def get_ami(region, instance_type):
+def coreos_release_metadata_url(channel, file_name):
+    return "http://{0}.release.core-os.net/amd64-usr/current/{1}".format(channel, file_name)
+
+def get_ami(channel, region, instance_type):
+    ami_file_path = "ami/{0}/{1}".format(channel, ami_list_file_name)
+    amis = utils.file_to_json(ami_file_path)
     image_type = image_types[instance_type.split('.')[0]]
+    return [ ami for ami in amis['amis'] if ami['name'] == region ][0][image_type]
 
-    return coreos_ami[region][image_type]
-
-def get_cluster_conf(cluster_name, region, cloud_config_path, key_pair_name, instance_type = 'm1.small', instances_count = 1, allocate_ip_address = False):
-    ami = get_ami(region, instance_type)
+def get_cluster_conf(cluster_name, region, cloud_config_path, key_pair_name, coreos_channel, instance_type = 'm1.small', instances_count = 1, allocate_ip_address = False):
+    ami = get_ami(coreos_channel, region, instance_type)
 
     logging.info("--> Fetching CoreOS etcd discovery token")
     cloud_config_file = open(cloud_config_path)
@@ -48,9 +36,9 @@ def get_cluster_conf(cluster_name, region, cloud_config_path, key_pair_name, ins
     cloud_config_file.close()
 
     return ClusterConf(
-        cluster_name, ami, key_pair_name, 
+        cluster_name, ami, key_pair_name, coreos_channel,
         user_data = cloud_config,
-        instance_type = instance_type, 
+        instance_type = instance_type,
         instances_count = instances_count, 
         allocate_ip_address = allocate_ip_address
     )
@@ -66,6 +54,7 @@ def read_conf(cluster_name, path):
         c['region'], 
         c['cloud_config'], 
         c['key_pair'],
+        c['coreos_channel'],
         instances_count = int(c['instances_count']),
         instance_type = c['instance_type'],
         allocate_ip_address = c['allocate_ip_address']
@@ -91,3 +80,13 @@ def to_camel_case(snake_str):
     """ Transform snake case string to camel case """
 
     return "".join(x.title() for x in snake_str.split('_'))
+
+def update_amis():
+
+    for channel in channels:
+        version_file_url = coreos_release_metadata_url(channel, version_file_name)
+        ami_list_file_url = coreos_release_metadata_url(channel, ami_list_file_name)
+        logging.info("downloading " + version_file_url)
+        logging.info("downloading " + ami_list_file_url)
+        utils.download_file(version_file_url, "ami/{0}/{1}".format(channel, version_file_name))
+        utils.download_file(ami_list_file_url, "ami/{0}/{1}".format(channel, ami_list_file_name))

@@ -9,7 +9,7 @@ from scp import SCPClient
  
 from lib.cluster import Cluster
 from lib.cluster_launcher import ClusterLauncher
-from lib.coreos import get_cluster_conf, read_conf
+from lib.coreos import get_cluster_conf, read_conf, update_amis
 from lib.cluster_conf import ClusterConf
 
 def main():
@@ -94,3 +94,8 @@ def main():
     elif args.op == "cleanup":
         utils.confirm("You are about to terminate and remove the whole cluster.")
         cluster.cleanup()
+
+    elif args.op == "update":
+        if not os.path.isdir(os.getcwd() + "/ami"):
+            raise ValueError("Updating AMIs is possible in project directory only !")
+        update_amis()
