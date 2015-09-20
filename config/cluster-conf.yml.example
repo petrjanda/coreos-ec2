@@ -3,6 +3,7 @@ cloud_config: config/cloud-config.example
 key_pair: YOUR-KEY
 instances_count: 1
 coreos_channel: stable
+coreos_version: current
 instance_type: c4.2xlarge
 allocate_ip_address: no
 

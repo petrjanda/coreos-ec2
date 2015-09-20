@@ -1,5 +1,4 @@
 import unittest
-import lib.coreos
 from lib.cluster_conf import ClusterConf
 
 class TestClusterConf(unittest.TestCase):
@@ -11,6 +10,7 @@ class TestClusterConf(unittest.TestCase):
         self.assertEqual(conf.cluster_name, 's-1')
         self.assertEqual(conf.ami, 'ami')
         self.assertEqual(conf.key_pair_name, 'key_pair')
+        self.assertEqual(conf.coreos_version, 'current')
         self.assertEqual(conf.coreos_channel, 'stable')
 
     def test_default_instances_count(self):
