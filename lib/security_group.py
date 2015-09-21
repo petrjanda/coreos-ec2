@@ -11,28 +11,8 @@ def create_security_group(kwargs):
         Description = kwargs['name'] + ' security'
     )
 
-    if('allow_all_own_traffic' in kwargs and kwargs['allow_all_own_traffic'] is True):
-        group.authorize_ingress(
-            SourceSecurityGroupName = kwargs['name']
-        )
-
-    if('allow_ssh_from' in kwargs):
-        group.authorize_ingress(
-            IpProtocol = 'tcp',
-            FromPort = 22,
-            ToPort = 22,
-            CidrIp = kwargs['allow_ssh_from']
-        )
-
-
-    if('allow_inbound' in kwargs):
-        for inbound in kwargs['allow_inbound']:
-            group.authorize_ingress(
-                IpProtocol = inbound['protocol'],
-                FromPort = inbound['from_port'],
-                ToPort = inbound['to_port'],
-                CidrIp = inbound['ip']
-            )
+    for ingress in kwargs['authorize_ingress']:
+        group.authorize_ingress(**ingress)
 
     return group
 
