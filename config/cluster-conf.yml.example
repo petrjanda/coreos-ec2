@@ -7,17 +7,17 @@ coreos_version: current
 instance_type: c4.2xlarge
 allocate_ip_address: no
 
-volumes:
+block_device_mappings:
   -
-    device_name: /dev/xvdb
-    ebs:
-        volume_size: 100
-        volume_type: gp2
-        delete_on_termination: yes
+    DeviceName: /dev/xvdb
+    Ebs:
+      VolumeSize: 100
+      VolumeType: gp2
+      DeleteOnTermination: True
 
   -
-    device_name: /dev/xvde
-    virtual_name: ephemeral0
+    DeviceName: /dev/xvde
+    VirtualName: ephemeral0
 
 security_groups:
   -

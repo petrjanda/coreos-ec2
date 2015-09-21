@@ -2,33 +2,54 @@ from botocore.exceptions import ClientError
 import yaml
 import unittest
 import boto3 as aws
-import botocore
+import lib.coreos as coreos
+import lib.cluster_launcher as launcher
 
-class TestAmi(unittest.TestCase):
 
+configuration = """
+    security_groups:
+      -
+        name: es
+        action: find_or_create
+        authorize_ingress:
+          -
+            SourceSecurityGroupName: es
+          -
+            IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            CidrIp: 91.219.244.207/32
 
-    def test_get_current_ami(self):
+"""
 
-        f = open("tests/security_groups_test.yml")
-        c = yaml.load(f.read())
-        f.close()
+class TestSecurityGroups(unittest.TestCase):
 
-        ec2 = aws.resource('ec2')
-        client = aws.client('ec2')
+    """
+        def test_creating_security_groups(self):
 
-        sg = c['security_groups'][0]
+            c = yaml.load(configuration)
 
-        group = ec2.create_security_group(
-            GroupName=sg['name'],
-            Description=sg['name'] + ' security'
-        )
+            ec2 = aws.resource('ec2')
+            client = aws.client('ec2')
 
-        try:
-            for ingress in sg['ingress']:
-                group.authorize_ingress(**ingress)
-        except ClientError as e:
-            print(e)
-            client.delete_security_group(
-                GroupName=sg['name']
+            sg = c['security_groups'][0]
+
+            group = ec2.create_security_group(
+                GroupName=sg['name'],
+                Description=sg['name'] + ' security'
             )
 
+            try:
+                for ingress in sg['authorize_ingress']:
+                    group.authorize_ingress(**ingress)
+            except ClientError as e:
+                client.delete_security_group(
+                    GroupName=sg['name']
+                )
+                raise e
+
+
+        def test_add_security_group(self):
+            conf = coreos.read_conf("whatever", "config/cluster-conf.yml.example")
+            launcher.add_security_group(conf.security_groups[0])
+    """

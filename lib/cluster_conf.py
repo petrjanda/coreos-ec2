@@ -22,7 +22,7 @@ class ClusterConf:
         self._instance_type = instance_type
         self._instances_count = instances_count
         self._allocate_ip_address = allocate_ip_address
-        self._volumes = []
+        self._block_device_mappings = []
         self._security_groups = []
 
     @property
@@ -83,7 +83,7 @@ class ClusterConf:
     def block_device_mappings(self):
         """ Block device mapping for EC2 instance creation """
 
-        return self._volumes
+        return self._block_device_mappings
 
     @property
     def props(self):
@@ -106,7 +106,7 @@ class ClusterConf:
     def volume(self, **kwargs):
         """ Add volume """
 
-        self._volumes.append(kwargs)
+        self._block_device_mappings.append(kwargs)
 
         return self
 
