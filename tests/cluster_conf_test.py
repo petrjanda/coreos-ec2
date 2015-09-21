@@ -79,8 +79,8 @@ class TestClusterConf(unittest.TestCase):
             .security_group(
                 action = 'create',
                 name = 'spark',
-                allow_inbound = [
-                    dict(protocol = 'tcp', from_port = 8080, to_port = 8080, ip = '0.0.0.0/0')
+                authorize_ingress = [
+                    dict(IpProtocol = 'tcp', FromPort = 8080, ToPort = 8080, IpProtocol = '0.0.0.0/0')
                 ]
             )
 
@@ -92,8 +92,8 @@ class TestClusterConf(unittest.TestCase):
             dict(
                 action = 'create',
                 name = 'spark',
-                allow_inbound = [
-                    dict(protocol = 'tcp', from_port = 8080, to_port = 8080, ip = '0.0.0.0/0')
+                authorize_ingress = [
+                    dict(IpProtocol = 'tcp', FromPort = 8080, ToPort = 8080, IpProtocol = '0.0.0.0/0')
                 ]
             )
 

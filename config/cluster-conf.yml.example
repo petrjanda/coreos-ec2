@@ -23,19 +23,26 @@ security_groups:
   -
     name: spark
     action: find_or_create
-    allow_inbound:
+    authorize_ingress:
       -
-        protocol: tcp
-        from_port: 8080
-        to_port: 8080
-        ip: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        CidrIp: 0.0.0.0/0
       -
-        protocol: tcp
-        from_port: 4040
-        to_port: 4040
-        ip: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 4040
+        ToPort: 4040
+        CidrIp: 0.0.0.0/0
+
   -
     name: $cluster_name
     action: create
-    allow_all_own_traffic: true
-    allow_ssh_from: 0.0.0.0/0
+    authorize_ingress:
+      -
+        SourceSecurityGroupName: $cluster_name
+      -
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
