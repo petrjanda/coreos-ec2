@@ -12,7 +12,8 @@ version_file_name = "version.txt"
 image_types = {
     't2': 'hvm',
     'm1': 'pv',
-    'c4': 'hvm'
+    'c4': 'hvm',
+    'm4': 'hvm'
 }
 
 def release_metadata_url(channel, version, file_name):
