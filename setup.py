@@ -8,7 +8,7 @@ requires = [
     'boto3==1.1.1',
     'paramiko==1.15.2',
     'scp==0.10.2',
-    'pyyaml==3.11'
+    'pyyaml==5.1'
 ]
 
 setup_options = dict(
