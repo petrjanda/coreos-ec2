@@ -4,7 +4,7 @@ import sys
 from setuptools import setup, find_packages
 
 requires = [
-    'requests==2.0',
+    'requests==2.20.0',
     'boto3==1.1.1',
     'paramiko==1.15.2',
     'scp==0.10.2',
